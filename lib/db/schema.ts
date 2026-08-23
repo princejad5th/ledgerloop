@@ -21,7 +21,7 @@ import {
   uniqueIndex,
   jsonb,
 } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 
 // ---------------------------------------------------------------------------
 // Enums
@@ -161,7 +161,7 @@ export const items = pgTable(
     userListedPlatformIdx: index('items_user_listed_platform').on(t.userId, t.listedPlatform),
     userExternalIdx: uniqueIndex('items_user_platform_external_id')
       .on(t.userId, t.listedPlatform, t.externalListingId)
-      .where(/* sql */ `external_listing_id IS NOT NULL`),
+      .where(sql`external_listing_id IS NOT NULL`),
   }),
 );
 
@@ -199,7 +199,7 @@ export const transactions = pgTable(
     userItemIdx: index('transactions_user_item').on(t.userId, t.itemId),
     dedupeIdx: uniqueIndex('transactions_dedupe')
       .on(t.userId, t.platform, t.externalTransactionId)
-      .where(/* sql */ `external_transaction_id IS NOT NULL`),
+      .where(sql`external_transaction_id IS NOT NULL`),
   }),
 );
 

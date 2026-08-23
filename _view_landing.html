@@ -1,0 +1,817 @@
+<div id="view-landing" class="view">
+
+  <!-- Sticky Nav -->
+  <header class="sticky-header nav-blur border-b border-stone-200">
+    <div class="container-x h-16 flex items-center justify-between">
+      <a href="#/" class="flex items-center gap-2.5 font-semibold text-base">
+        <span class="wordmark wordmark-sm">
+          <svg width="14" height="14" viewBox="0 0 32 32" fill="none">
+            <path d="M9 9v14h14" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="20" cy="13" r="2" fill="currentColor"/>
+          </svg>
+        </span>
+        LedgerLoop
+      </a>
+      <nav class="hidden md:flex items-center gap-1">
+        <a href="#features"   class="btn btn-ghost btn-sm">Features</a>
+        <a href="#how"        class="btn btn-ghost btn-sm">How it works</a>
+        <a href="#pricing"    class="btn btn-ghost btn-sm">Pricing</a>
+        <a href="#calculator" class="btn btn-ghost btn-sm">
+          <i data-lucide="calculator" class="w-3.5 h-3.5"></i>
+          Free calculator
+        </a>
+        <a href="#faq"        class="btn btn-ghost btn-sm">FAQ</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="#/login" class="btn btn-ghost btn-sm">Sign in</a>
+        <a href="#/login" class="btn btn-primary btn-sm">
+          Start free trial
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="bg-hero relative">
+    <div class="absolute inset-0 pattern-overlay opacity-40 pointer-events-none"></div>
+    <div class="container-x py-24 md:py-32 relative">
+      <div class="max-w-3xl mx-auto text-center">
+        <span class="badge badge-brand badge-dot mb-6">For UK eBay, Etsy &amp; Depop resellers</span>
+        <h1 class="h-display text-5xl md:text-7xl">
+          Stop guessing your<br>
+          <span class="grad-text">reselling profit.</span>
+        </h1>
+        <p class="mt-7 text-lg md:text-xl text-stone-600 leading-relaxed max-w-2xl mx-auto">
+          Drop in your eBay, Etsy or Depop CSV. Get HMRC SA103S figures in 60 seconds.
+          Per-item profit, ROI and hold time — the tax tool every UK reseller has been waiting for.
+        </p>
+        <div class="mt-9 flex flex-wrap gap-3 justify-center">
+          <a href="#/login" class="btn btn-primary btn-lg">
+            Start 14-day free trial
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </a>
+          <a href="#how" class="btn btn-outline btn-lg">
+            See how it works
+            <i data-lucide="play-circle" class="w-4 h-4"></i>
+          </a>
+        </div>
+        <div class="mt-6 flex items-center justify-center gap-x-6 gap-y-2 text-sm text-stone-500 flex-wrap">
+          <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-profit"></i>No card required</span>
+          <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-profit"></i>Cancel any time</span>
+          <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-profit"></i>HMRC SA103S ready</span>
+        </div>
+
+        <!-- Platform pills -->
+        <div class="mt-12 flex flex-wrap items-center justify-center gap-3">
+          <span class="text-xs text-stone-500 uppercase tracking-wider font-medium mr-2">Works with</span>
+          <span class="platform-pill">
+            <span class="pp-icon" style="background:#0064D2">eb</span>
+            eBay
+          </span>
+          <span class="platform-pill">
+            <span class="pp-icon" style="background:#F1641E">e</span>
+            Etsy
+          </span>
+          <span class="platform-pill">
+            <span class="pp-icon" style="background:#FF2300">D</span>
+            Depop
+          </span>
+          <span class="text-xs text-stone-500 font-medium">+ more soon</span>
+        </div>
+      </div>
+
+      <!-- Mock SA103S preview -->
+      <div class="mt-20 mx-auto max-w-5xl card shadow-glow overflow-hidden">
+        <div class="bg-stone-50 border-b border-stone-200 px-5 py-3 flex items-center gap-2">
+          <div class="flex gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-stone-300"></span>
+            <span class="w-3 h-3 rounded-full bg-stone-300"></span>
+            <span class="w-3 h-3 rounded-full bg-stone-300"></span>
+          </div>
+          <span class="text-xs text-stone-500 ml-3 mono">app.ledgerloop.app/tax</span>
+        </div>
+        <div class="p-8 grid md:grid-cols-2 gap-8 items-center bg-gradient-to-br from-white to-brand-50/40">
+          <div>
+            <span class="badge badge-success badge-dot mb-3">SA103S ready</span>
+            <h3 class="h-section text-2xl mb-4">Your 2025/26 tax estimate</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-baseline">
+                <span class="text-sm text-stone-500">Turnover (Box 9)</span>
+                <span class="mono text-lg font-semibold">£18,500.00</span>
+              </div>
+              <div class="flex justify-between items-baseline">
+                <span class="text-sm text-stone-500">Allowable expenses (Box 20)</span>
+                <span class="mono text-lg font-semibold">£9,900.00</span>
+              </div>
+              <div class="flex justify-between items-baseline">
+                <span class="text-sm text-stone-500">Net profit (Box 21)</span>
+                <span class="mono text-lg font-semibold text-profit">£8,600.00</span>
+              </div>
+              <div class="border-t border-stone-200 pt-3 flex justify-between items-baseline">
+                <span class="text-sm font-medium text-stone-700">Estimated tax due</span>
+                <span class="mono text-2xl font-bold">£2,494.00</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-stone-200 p-5">
+            <div class="text-xs uppercase tracking-wider text-stone-500 font-medium mb-3 flex items-center justify-between">
+              Recent items
+              <span class="badge badge-brand-outline text-[10px] !py-0.5">3 platforms</span>
+            </div>
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2 truncate">
+                  <span class="pp-icon" style="background:#0064D2; width:14px; height:14px; font-size:7px">eb</span>
+                  Vintage Levi 501 W32
+                </span>
+                <span class="mono text-profit">+£32.17</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2 truncate">
+                  <span class="pp-icon" style="background:#FF2300; width:14px; height:14px; font-size:7px">D</span>
+                  Nike Air Max 90 UK9
+                </span>
+                <span class="mono text-profit">+£41.27</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2 truncate">
+                  <span class="pp-icon" style="background:#F1641E; width:14px; height:14px; font-size:7px">e</span>
+                  Handmade ceramic mug
+                </span>
+                <span class="mono text-profit">+£18.40</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2 truncate">
+                  <span class="pp-icon" style="background:#0064D2; width:14px; height:14px; font-size:7px">eb</span>
+                  Carhartt Detroit jacket
+                </span>
+                <span class="mono text-profit">+£60.43</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2 truncate">
+                  <span class="pp-icon" style="background:#FF2300; width:14px; height:14px; font-size:7px">D</span>
+                  Stone Island cord W34
+                </span>
+                <span class="mono text-profit">+£22.59</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider-brand"></div>
+
+  <!-- BENEFITS strip (replaces fake stats) -->
+  <section class="bg-cream">
+    <div class="container-x py-16">
+      <div class="max-w-2xl mx-auto text-center reveal mb-12">
+        <h2 class="h-section text-3xl md:text-4xl">Built for resellers, not accountants.</h2>
+        <p class="mt-4 text-stone-600">Four things LedgerLoop does that your spreadsheet doesn't.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="benefit-card reveal">
+          <div class="w-11 h-11 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center mb-4">
+            <i data-lucide="zap" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-semibold text-base">60-second SA103S</h3>
+          <p class="mt-2 text-sm text-stone-600 leading-relaxed">From raw CSV to the boxes HMRC asks for, in under a minute.</p>
+        </div>
+        <div class="benefit-card reveal">
+          <div class="w-11 h-11 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center mb-4">
+            <i data-lucide="calculator" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-semibold text-base">Decimal-perfect maths</h3>
+          <p class="mt-2 text-sm text-stone-600 leading-relaxed">Every fee, refund and shipping cost — never a floating-point penny out.</p>
+        </div>
+        <div class="benefit-card reveal">
+          <div class="w-11 h-11 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center mb-4">
+            <i data-lucide="layers" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-semibold text-base">Multi-platform</h3>
+          <p class="mt-2 text-sm text-stone-600 leading-relaxed">One dashboard for eBay, Etsy and Depop. No more taping spreadsheets together.</p>
+        </div>
+        <div class="benefit-card reveal">
+          <div class="w-11 h-11 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center mb-4">
+            <i data-lucide="trending-up" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-semibold text-base">Real-time charts</h3>
+          <p class="mt-2 text-sm text-stone-600 leading-relaxed">Track revenue, profit and cost trends over time. Spot what's actually working.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE KILLER FEATURE -->
+  <section id="features" class="bg-white-clean section">
+    <div class="container-x">
+      <div class="max-w-2xl mx-auto text-center reveal">
+        <span class="badge badge-brand mb-4">The killer feature</span>
+        <h2 class="h-section text-4xl md:text-5xl">CSV → SA103S in 60 seconds.</h2>
+        <p class="mt-5 text-lg text-stone-600 leading-relaxed">
+          You shouldn't need an accounting degree to do your taxes. LedgerLoop
+          converts your raw marketplace exports into the exact boxes HMRC asks for
+          on your Self Assessment.
+        </p>
+      </div>
+
+      <div class="mt-16 grid md:grid-cols-12 gap-6 items-center">
+        <div class="md:col-span-5 space-y-5 reveal">
+          <div class="card-feature p-6">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="file-down" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-base">Drop in your CSV</h3>
+                <p class="text-sm text-stone-600 mt-1 leading-relaxed">eBay Transaction Report, Etsy Orders CSV, or Depop sales download. We auto-detect the platform from the headers.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-feature p-6">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="cpu" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-base">We do the maths</h3>
+                <p class="text-sm text-stone-600 mt-1 leading-relaxed">Fees, refunds, postage, cost of goods, the trading allowance — all computed with decimal precision.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-feature p-6">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="receipt" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-base">Export your SA103S</h3>
+                <p class="text-sm text-stone-600 mt-1 leading-relaxed">Box 9, 20, 21 and 31 ready to copy into your return — or hand to your accountant.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="md:col-span-7 reveal">
+          <div class="card overflow-hidden">
+            <div class="bg-gradient-to-br from-brand-50 to-white border-b border-stone-200 px-5 py-3 flex items-center justify-between">
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">HMRC SA103S preview</p>
+              <span class="badge badge-success">Tax year 2025/26</span>
+            </div>
+            <div class="divide-y divide-stone-200">
+              <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 9</div><div><div class="text-sm font-medium">Your turnover</div><div class="text-xs text-stone-500 mt-0.5">Total takings from sales</div></div><div class="mono font-medium">£18,500.00</div></div>
+              <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 20</div><div><div class="text-sm font-medium">Allowable expenses</div><div class="text-xs text-stone-500 mt-0.5">COGS + fees + postage + refunds</div></div><div class="mono font-medium">£9,900.00</div></div>
+              <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 21</div><div><div class="text-sm font-medium">Net profit</div><div class="text-xs text-stone-500 mt-0.5">Turnover − expenses</div></div><div class="mono font-medium text-profit">£8,600.00</div></div>
+              <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 31</div><div><div class="text-sm font-medium">Total taxable profits</div><div class="text-xs text-stone-500 mt-0.5">What HMRC taxes you on</div></div><div class="mono font-medium">£8,600.00</div></div>
+            </div>
+            <div class="bg-brand-50 border-t border-brand-200 px-5 py-3 flex items-center justify-between">
+              <span class="text-xs text-brand-800">Estimates only. Verify before submitting to HMRC.</span>
+              <button class="btn btn-primary btn-sm">
+                <i data-lucide="download" class="w-4 h-4"></i> Export CSV
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider-brand"></div>
+
+  <!-- Multi-platform highlight -->
+  <section class="bg-amber-tint section">
+    <div class="container-x">
+      <div class="max-w-2xl mx-auto text-center reveal">
+        <span class="badge badge-brand-outline mb-4">Multi-platform</span>
+        <h2 class="h-section text-4xl md:text-5xl">One tool. Three marketplaces.</h2>
+        <p class="mt-5 text-lg text-stone-600 leading-relaxed">
+          Sell on more than one platform? LedgerLoop auto-detects each export format
+          and stitches it all into a single profit picture.
+        </p>
+      </div>
+
+      <div class="mt-16 grid md:grid-cols-3 gap-6 reveal">
+        <div class="card-feature p-7">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="pp-icon" style="background:#0064D2; width:36px; height:36px; font-size:14px; border-radius:10px;">eb</div>
+            <h3 class="font-semibold text-lg">eBay</h3>
+          </div>
+          <p class="text-sm text-stone-600 leading-relaxed">
+            Seller Hub → Payments → Reports → Transaction Report. We match sales, fees,
+            refunds and shipping labels by order number.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            <span class="badge badge-soft text-[10px] !py-0.5">Auto-detect</span>
+            <span class="badge badge-soft text-[10px] !py-0.5">Fee extraction</span>
+            <span class="badge badge-soft text-[10px] !py-0.5">Refund matching</span>
+          </div>
+        </div>
+        <div class="card-feature p-7">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="pp-icon" style="background:#F1641E; width:36px; height:36px; font-size:14px; border-radius:10px;">e</div>
+            <h3 class="font-semibold text-lg">Etsy</h3>
+          </div>
+          <p class="text-sm text-stone-600 leading-relaxed">
+            Shop Manager → Settings → Options → Download Data. Orders CSV or Order Items CSV
+            — both supported, including transaction fees and shipping charged.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            <span class="badge badge-soft text-[10px] !py-0.5">Order &amp; Item modes</span>
+            <span class="badge badge-soft text-[10px] !py-0.5">Card fees</span>
+            <span class="badge badge-soft text-[10px] !py-0.5">UK + EU sales</span>
+          </div>
+        </div>
+        <div class="card-feature p-7">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="pp-icon" style="background:#FF2300; width:36px; height:36px; font-size:14px; border-radius:10px;">D</div>
+            <h3 class="font-semibold text-lg">Depop</h3>
+          </div>
+          <p class="text-sm text-stone-600 leading-relaxed">
+            Sales download from your seller dashboard. We handle Depop Payments fees,
+            optional Boost fees, refunds and the quarterly 3-month file limit.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            <span class="badge badge-soft text-[10px] !py-0.5">Multi-file upload</span>
+            <span class="badge badge-soft text-[10px] !py-0.5">Auto fee fallback</span>
+            <span class="badge badge-soft text-[10px] !py-0.5">Refund tracking</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="bg-white-clean section">
+    <div class="container-x">
+      <div class="max-w-2xl mx-auto text-center reveal">
+        <span class="badge badge-soft mb-4">How it works</span>
+        <h2 class="h-section text-4xl md:text-5xl">Three steps. Five minutes. Done.</h2>
+        <p class="mt-5 text-lg text-stone-600 leading-relaxed">
+          From marketplace export to SA103 figures in less time than it takes to make a cuppa.
+        </p>
+      </div>
+
+      <div class="mt-16 grid md:grid-cols-3 gap-8 md:gap-10 reveal">
+        <div class="relative">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="w-10 h-10 rounded-xl bg-brand-500 text-white font-semibold flex items-center justify-center text-base shadow-sm">1</span>
+            <span class="font-semibold text-lg">Export your CSV</span>
+          </div>
+          <p class="text-stone-600 leading-relaxed text-[15px]">
+            From eBay Seller Hub, Etsy Shop Manager, or your Depop sales dashboard.
+            Drop the file straight onto LedgerLoop — no setup, no API approval, no waiting.
+          </p>
+        </div>
+        <div class="relative">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="w-10 h-10 rounded-xl bg-brand-500 text-white font-semibold flex items-center justify-center text-base shadow-sm">2</span>
+            <span class="font-semibold text-lg">We match &amp; calculate</span>
+          </div>
+          <p class="text-stone-600 leading-relaxed text-[15px]">
+            We auto-detect the marketplace, parse every row, match fees against orders,
+            apply the right HMRC rates, and produce your per-item profit picture.
+          </p>
+        </div>
+        <div class="relative">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="w-10 h-10 rounded-xl bg-brand-500 text-white font-semibold flex items-center justify-center text-base shadow-sm">3</span>
+            <span class="font-semibold text-lg">Export to HMRC</span>
+          </div>
+          <p class="text-stone-600 leading-relaxed text-[15px]">
+            Open the Tax page. Pick your year. See SA103S boxes ready to file.
+            Export as CSV, hand to your accountant, or copy the figures into your return.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="bg-cream section">
+    <div class="container-x">
+      <div class="max-w-2xl mx-auto text-center reveal">
+        <span class="badge badge-brand mb-4">Pricing</span>
+        <h2 class="h-section text-4xl md:text-5xl">Simple pricing. Built for UK resellers.</h2>
+        <p class="mt-5 text-lg text-stone-600 leading-relaxed">
+          Pick the plan that fits your side hustle. Switch any time. 7-day money-back guarantee.
+        </p>
+      </div>
+
+      <div class="mt-16 grid md:grid-cols-3 gap-6 items-stretch reveal">
+
+        <!-- Monthly Hustler -->
+        <div class="card p-8 flex flex-col">
+          <div>
+            <h3 class="text-base font-semibold text-stone-800">Monthly Hustler</h3>
+            <p class="text-sm text-stone-500 mt-1">For the side-hustler testing the waters.</p>
+            <div class="mt-6 flex items-baseline gap-2">
+              <span class="mono text-5xl font-bold tracking-tight">£12</span>
+              <span class="text-stone-500">/ month</span>
+            </div>
+            <p class="text-xs text-stone-500 mt-2">Cancel any time. No contract.</p>
+            <a href="#/login" class="btn btn-outline w-full mt-6">Start free trial</a>
+          </div>
+          <ul class="mt-8 space-y-3 text-sm flex-1">
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>Full ROI &amp; profit tracking</li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>Inventory management</li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>Per-item profit &amp; hold time</li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>CSV imports (eBay, Etsy, Depop)</li>
+            <li class="flex gap-2.5 text-stone-400"><i data-lucide="x" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>HMRC SA103S export</li>
+            <li class="flex gap-2.5 text-stone-400"><i data-lucide="x" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>Priority CSV parsing</li>
+          </ul>
+        </div>
+
+        <!-- Pro Annual (FEATURED) -->
+        <div class="price-card-featured p-8 flex flex-col">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+            <span class="badge badge-brand" style="background:#F97316;color:white;font-weight:600;">
+              <i data-lucide="sparkles" class="w-3 h-3"></i> Most popular
+            </span>
+          </div>
+          <div>
+            <h3 class="text-base font-semibold text-stone-800">Pro Annual</h3>
+            <p class="text-sm text-stone-500 mt-1">For the serious reseller who wants to stay legal &amp; profitable.</p>
+            <div class="mt-6 flex items-baseline gap-2">
+              <span class="mono text-5xl font-bold tracking-tight">£84</span>
+              <span class="text-stone-500">/ year</span>
+            </div>
+            <p class="text-xs text-brand-700 font-medium mt-2">£7 / month — pay for 7 months, get 12.</p>
+            <a href="#/login" class="btn btn-primary w-full mt-6">
+              Start free trial
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+          <ul class="mt-8 space-y-3 text-sm flex-1">
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i><span><strong>Everything in Monthly</strong>, plus:</span></li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i><strong>HMRC SA103S export</strong></li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i><strong>Priority CSV parsing</strong></li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>Trading allowance optimiser</li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>Accountant-ready CSV</li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>Priority email support</li>
+          </ul>
+        </div>
+
+        <!-- Tax-Season Emergency Pass -->
+        <div class="card p-8 flex flex-col">
+          <div>
+            <h3 class="text-base font-semibold text-stone-800">Tax-Season Emergency Pass</h3>
+            <p class="text-sm text-stone-500 mt-1">For when 31 January is two weeks away and you've got 12 CSVs.</p>
+            <div class="mt-6 flex items-baseline gap-2">
+              <span class="mono text-5xl font-bold tracking-tight">£39</span>
+              <span class="text-stone-500">one-off</span>
+            </div>
+            <p class="text-xs text-stone-500 mt-2">Single tax year. No subscription.</p>
+            <a href="#/login" class="btn btn-outline w-full mt-6">Unlock my tax year</a>
+          </div>
+          <ul class="mt-8 space-y-3 text-sm flex-1">
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>Full year of CSV imports</li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i><strong>SA103S Box 9, 20, 21 figures</strong></li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>Trading allowance recommendation</li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>Accountant-ready export</li>
+            <li class="flex gap-2.5"><i data-lucide="check" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i><strong>30-day access</strong></li>
+            <li class="flex gap-2.5"><i data-lucide="gift" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>£20 off Pro Annual within 48h</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-12 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-stone-600">
+        <span class="flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-brand-600"></i>7-day money-back guarantee</span>
+        <span class="flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4 text-brand-600"></i>Secure payment via Stripe</span>
+        <span class="flex items-center gap-2"><i data-lucide="heart" class="w-4 h-4 text-brand-600"></i>Made by UK resellers</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="bg-white-clean section">
+    <div class="container-x">
+      <div class="max-w-2xl mx-auto reveal">
+        <div class="text-center">
+          <span class="badge badge-soft mb-4">FAQ</span>
+          <h2 class="h-section text-4xl md:text-5xl">Common questions.</h2>
+        </div>
+        <div class="mt-12 card divide-y divide-stone-200">
+          <details class="faq-item px-6">
+            <summary>
+              <span class="font-medium">Is LedgerLoop approved by HMRC?</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
+            </summary>
+            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
+              No software is "HMRC-approved" for Self Assessment — including major accounting suites.
+              What LedgerLoop produces are accurate <em>estimates</em> mapped to the boxes on the SA103S
+              form. Every rate we use is verified from gov.uk. We always recommend you double-check
+              with HMRC or a qualified accountant before submitting your return.
+            </div>
+          </details>
+          <details class="faq-item px-6">
+            <summary>
+              <span class="font-medium">How do I get my CSV from eBay / Etsy / Depop?</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
+            </summary>
+            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
+              <strong>eBay:</strong> Seller Hub → Payments → Reports → Transaction report. Pick a date range.<br>
+              <strong>Etsy:</strong> Shop Manager → Settings → Options → Download Data → Orders CSV.<br>
+              <strong>Depop:</strong> Your seller dashboard → sales download (3-month chunks, upload multiple for a full year).<br>
+              Drop the resulting file on the LedgerLoop import page. We auto-detect the platform.
+            </div>
+          </details>
+          <details class="faq-item px-6">
+            <summary>
+              <span class="font-medium">What if I sell on multiple platforms?</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
+            </summary>
+            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
+              Upload as many CSVs as you have. We dedupe by order number, so re-uploading the
+              same file is safe. Your dashboard and tax page combine everything across all
+              three platforms automatically.
+            </div>
+          </details>
+          <details class="faq-item px-6">
+            <summary>
+              <span class="font-medium">Can I get a refund?</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
+            </summary>
+            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
+              Yes — 7-day money-back guarantee on all paid plans, no questions asked.
+            </div>
+          </details>
+          <details class="faq-item px-6">
+            <summary>
+              <span class="font-medium">Is my data secure?</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
+            </summary>
+            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
+              Yes. Data is encrypted at rest and in transit, hosted in the UK, GDPR-compliant.
+              We don't sell your data. Payment is processed by Stripe; we never see your card details.
+            </div>
+          </details>
+          <details class="faq-item px-6">
+            <summary>
+              <span class="font-medium">Do I need to use it monthly or only at tax time?</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
+            </summary>
+            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
+              Most users log in weekly to drop in their latest CSVs and check ROI. If you're
+              only here for tax season, that's exactly what the Emergency Pass is for — £39, one-off,
+              get your year done, walk away.
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- FREE TAX CALCULATOR — SEO-optimised public tool                -->
+  <!-- ============================================================ -->
+  <section id="calculator" class="calc-bg section">
+    <div class="container-x">
+      <div class="max-w-2xl mx-auto text-center reveal mb-12">
+        <span class="badge badge-brand mb-4">
+          <i data-lucide="calculator" class="w-3.5 h-3.5"></i>
+          Free · No sign-up
+        </span>
+        <h2 class="h-section text-4xl md:text-5xl">UK reseller tax calculator</h2>
+        <p class="mt-5 text-lg text-stone-600 leading-relaxed">
+          Estimate your HMRC self-assessment bill for 2024/25 or 2025/26. Built on the same
+          engine LedgerLoop uses, with verified rates from <span class="font-medium text-stone-800">gov.uk</span>.
+        </p>
+      </div>
+
+      <div class="max-w-5xl mx-auto card overflow-hidden reveal" style="box-shadow: 0 30px 60px -30px rgba(249,115,22,0.25);">
+        <div class="grid md:grid-cols-2">
+
+          <!-- INPUTS -->
+          <div class="p-7 md:p-9 border-b md:border-b-0 md:border-r border-stone-200">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="font-semibold text-base">Your numbers</h3>
+              <div class="inline-flex bg-stone-100 rounded-lg p-1" id="calc-year-toggle">
+                <button class="calc-year-btn active" data-year="2024">2024/25</button>
+                <button class="calc-year-btn" data-year="2025">2025/26</button>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <div>
+                <div class="flex justify-between items-baseline mb-2">
+                  <label class="text-sm font-medium" for="calc-turnover">Reselling turnover (annual)</label>
+                  <input type="number" id="calc-turnover-input" class="calc-num-input" min="0" max="200000" step="100" value="18500" inputmode="decimal">
+                </div>
+                <input type="range" id="calc-turnover" class="calc-slider" min="0" max="100000" step="500" value="18500">
+                <div class="flex justify-between text-xs text-stone-500 mt-1 mono">
+                  <span>£0</span><span>£100,000</span>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-baseline mb-2">
+                  <label class="text-sm font-medium" for="calc-costs">Total costs &amp; expenses</label>
+                  <input type="number" id="calc-costs-input" class="calc-num-input" min="0" max="200000" step="100" value="9900" inputmode="decimal">
+                </div>
+                <input type="range" id="calc-costs" class="calc-slider" min="0" max="100000" step="500" value="9900">
+                <p class="text-xs text-stone-500 mt-2 leading-relaxed">COGS + platform fees + postage + packaging + mileage. We'll automatically apply the £1,000 trading allowance if it's better.</p>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-baseline mb-2">
+                  <label class="text-sm font-medium" for="calc-paye">Other PAYE income (optional)</label>
+                  <input type="number" id="calc-paye-input" class="calc-num-input" min="0" max="200000" step="100" value="32000" inputmode="decimal">
+                </div>
+                <input type="range" id="calc-paye" class="calc-slider" min="0" max="100000" step="500" value="32000">
+                <p class="text-xs text-stone-500 mt-2 leading-relaxed">Your day-job salary before tax. Shapes whether your reselling profit lands in the 20% or 40% band.</p>
+              </div>
+
+              <div>
+                <label class="text-sm font-medium block mb-2" for="calc-sl">Student loan plan</label>
+                <select id="calc-sl" class="calc-select">
+                  <option value="NONE">No student loan</option>
+                  <option value="PLAN_1">Plan 1</option>
+                  <option value="PLAN_2" selected>Plan 2</option>
+                  <option value="PLAN_4">Plan 4 (Scotland)</option>
+                  <option value="PLAN_5">Plan 5</option>
+                  <option value="POSTGRAD">Postgraduate</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- OUTPUT -->
+          <div class="p-7 md:p-9 calc-output-bg">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-medium text-brand-700 uppercase tracking-wider">Estimated HMRC bill</p>
+              <span class="badge badge-brand-outline text-[10px] !py-0.5" id="calc-path-badge">Actual expenses</span>
+            </div>
+            <p class="mono calc-headline text-5xl md:text-6xl font-bold" id="calc-total">£2,494</p>
+            <p class="text-sm text-stone-600 mt-2">
+              On <span class="mono font-medium text-stone-800" id="calc-trading-profit">£8,600</span> trading profit
+            </p>
+
+            <!-- Visual breakdown -->
+            <div class="mt-7">
+              <div class="flex justify-between text-xs text-stone-500 mb-2">
+                <span>How your trading profit splits</span>
+                <span class="mono" id="calc-profit-total">£8,600</span>
+              </div>
+              <div class="calc-breakdown" id="calc-breakdown">
+                <div class="calc-segment" style="background:#10B981; flex:80;" data-label="Take-home"></div>
+                <div class="calc-segment" style="background:#F97316; flex:20;" data-label="Income tax"></div>
+                <div class="calc-segment" style="background:#FB923C; flex:0;" data-label="Class 4 NIC"></div>
+                <div class="calc-segment" style="background:#FDBA74; flex:0;" data-label="Student loan"></div>
+              </div>
+              <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 text-xs">
+                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-sm" style="background:#10B981"></span>Take-home <span class="mono ml-auto font-medium" id="calc-key-takehome">£6,106</span></div>
+                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-sm" style="background:#F97316"></span>Income tax <span class="mono ml-auto font-medium" id="calc-key-tax">£1,720</span></div>
+                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-sm" style="background:#FB923C"></span>Class 4 NIC <span class="mono ml-auto font-medium" id="calc-key-c4">£0</span></div>
+                <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-sm" style="background:#FDBA74"></span>Student loan <span class="mono ml-auto font-medium" id="calc-key-sl">£774</span></div>
+              </div>
+            </div>
+
+            <!-- Full breakdown -->
+            <div class="mt-7 pt-6 border-t border-brand-200/60 space-y-0.5 text-sm">
+              <div class="calc-line">
+                <span class="text-stone-600">Turnover</span>
+                <span class="mono font-medium" id="calc-row-turnover">£18,500</span>
+              </div>
+              <div class="calc-line">
+                <span class="text-stone-600">Allowable expenses</span>
+                <span class="mono font-medium" id="calc-row-expenses">£9,900</span>
+              </div>
+              <div class="calc-line border-b border-brand-200/60">
+                <span class="text-stone-600">Trading profit</span>
+                <span class="mono font-medium text-profit" id="calc-row-profit">£8,600</span>
+              </div>
+              <div class="calc-line">
+                <span class="text-stone-600">Income tax (marginal)</span>
+                <span class="mono font-medium" id="calc-row-tax">£1,720</span>
+              </div>
+              <div class="calc-line">
+                <span class="text-stone-600">Class 4 NIC</span>
+                <span class="mono font-medium" id="calc-row-c4">£0</span>
+              </div>
+              <div class="calc-line">
+                <span class="text-stone-600">Student loan</span>
+                <span class="mono font-medium" id="calc-row-sl">£774</span>
+              </div>
+              <div class="calc-line pt-3 border-t border-brand-200/60">
+                <span class="font-medium">Take-home after tax</span>
+                <span class="mono font-bold text-profit" id="calc-row-takehome">£6,106</span>
+              </div>
+            </div>
+
+            <!-- Allowance advisory -->
+            <div id="calc-allowance-tip" class="mt-5 rounded-xl p-3 text-xs flex gap-2 hidden" style="background:#FFFFFF; border:1px dashed #FED7AA;">
+              <i data-lucide="lightbulb" class="w-4 h-4 text-brand-600 flex-shrink-0 mt-0.5"></i>
+              <span class="text-stone-700" id="calc-allowance-tip-text"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer: disclaimer + CTA -->
+        <div class="bg-stone-50 border-t border-stone-200 px-7 md:px-9 py-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <p class="text-xs text-stone-500 leading-relaxed max-w-md">
+            Estimates only. LedgerLoop is not a regulated tax advisor.
+            Verify with HMRC or a qualified accountant before submitting.
+          </p>
+          <a href="#/login" class="btn btn-primary btn-sm flex-shrink-0">
+            Get this automatically every month
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Small print + value-add links below the calculator -->
+      <div class="mt-12 max-w-3xl mx-auto text-center text-sm text-stone-600 reveal">
+        <p>
+          This calculator uses HMRC's verified 2024/25 and 2025/26 rates — personal allowance £12,570,
+          income tax bands 20/40/45%, Class 4 NIC 6%/2%, trading allowance £1,000. It accounts for
+          the personal allowance taper above £100k and marginal-rate stacking against PAYE income.
+        </p>
+        <p class="mt-4 text-stone-500">
+          Read more:
+          <a href="https://www.gov.uk/income-tax-rates" target="_blank" rel="noopener" class="text-brand-700 hover:underline">Income tax rates</a> ·
+          <a href="https://www.gov.uk/self-employed-national-insurance-rates" target="_blank" rel="noopener" class="text-brand-700 hover:underline">Self-employed NI</a> ·
+          <a href="https://www.gov.uk/guidance/tax-free-allowances-on-property-and-trading-income" target="_blank" rel="noopener" class="text-brand-700 hover:underline">Trading allowance</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="bg-stone-soft section">
+    <div class="container-x">
+      <div class="max-w-4xl mx-auto card overflow-hidden reveal">
+        <div class="px-8 md:px-14 py-14 md:py-20 text-center text-white relative overflow-hidden" style="background:linear-gradient(135deg,#F97316 0%,#C2410C 60%,#9A3412 100%);">
+          <div class="absolute inset-0 pattern-overlay opacity-30 pointer-events-none"></div>
+          <div class="relative">
+            <h2 class="h-display text-4xl md:text-5xl">Stop dreading 31 January.</h2>
+            <p class="mt-5 text-lg text-brand-50 max-w-2xl mx-auto leading-relaxed">
+              Let LedgerLoop do the maths. 14 days free. No card required. Cancel any time.
+            </p>
+            <div class="mt-9 flex flex-wrap gap-3 justify-center">
+              <a href="#/login" class="btn btn-lg" style="background:white;color:#9A3412;font-weight:600;">
+                Start free trial
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </a>
+              <a href="#pricing" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);">
+                See pricing
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-stone-200 bg-white">
+    <div class="container-x py-12">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <a href="#/" class="flex items-center gap-2.5 font-semibold">
+            <span class="wordmark wordmark-sm">
+              <svg width="14" height="14" viewBox="0 0 32 32" fill="none">
+                <path d="M9 9v14h14" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="20" cy="13" r="2" fill="currentColor"/>
+              </svg>
+            </span>
+            LedgerLoop
+          </a>
+          <p class="mt-4 text-sm text-stone-600 leading-relaxed max-w-xs">
+            Tax automation built for UK eBay, Etsy and Depop resellers.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs font-medium uppercase tracking-wider text-stone-500">Product</p>
+          <ul class="mt-4 space-y-2 text-sm">
+            <li><a href="#features" class="text-stone-700 hover:text-brand-700">Features</a></li>
+            <li><a href="#how"      class="text-stone-700 hover:text-brand-700">How it works</a></li>
+            <li><a href="#pricing"  class="text-stone-700 hover:text-brand-700">Pricing</a></li>
+            <li><a href="#faq"      class="text-stone-700 hover:text-brand-700">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-xs font-medium uppercase tracking-wider text-stone-500">Company</p>
+          <ul class="mt-4 space-y-2 text-sm">
+            <li><a href="#" class="text-stone-700 hover:text-brand-700">About</a></li>
+            <li><a href="#" class="text-stone-700 hover:text-brand-700">Blog</a></li>
+            <li><a href="#" class="text-stone-700 hover:text-brand-700">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-xs font-medium uppercase tracking-wider text-stone-500">Legal</p>
+          <ul class="mt-4 space-y-2 text-sm">
+            <li><a href="#" class="text-stone-700 hover:text-brand-700">Terms</a></li>
+            <li><a href="#" class="text-stone-700 hover:text-brand-700">Privacy</a></li>
+            <li><a href="#" class="text-stone-700 hover:text-brand-700">Cookies</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-12 pt-8 border-t border-stone-200 flex flex-wrap items-center justify-between gap-4 text-sm text-stone-500">
+        <p>© 2026 LedgerLoop. Estimates only — not regulated tax advice.</p>
+        <p>Made in the UK 🇬🇧</p>
+      </div>
+    </div>
+  </footer>
+</div>

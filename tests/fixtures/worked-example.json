@@ -1,0 +1,29 @@
+{
+  "description": "Worked example from docs/tax-engine.md §6. 2024/25 scenario for the demo user.",
+  "scenario": {
+    "startYear": 2024,
+    "turnover": 18500,
+    "costOfGoodsSold": 6200,
+    "directSaleCosts": 2800,
+    "generalExpenses": 900,
+    "payeIncome": 32000,
+    "studentLoanPlan": "PLAN_2"
+  },
+  "expectedActualExpenses": {
+    "allowableExpenses": 9900,
+    "tradingProfit": 8600,
+    "incomeTax": 1720,
+    "class4NIC": 0,
+    "class2NIC": 0,
+    "studentLoanRepayment": 774,
+    "totalEstimatedLiability": 2494
+  },
+  "expectedAllowance": {
+    "tradingProfit": 17500,
+    "incomeTax": 3500,
+    "class4NIC": 295.80,
+    "class2NIC": 0,
+    "studentLoanRepayment": 1575,
+    "totalEstimatedLiability": 5370.80
+  }
+}

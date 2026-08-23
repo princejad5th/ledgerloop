@@ -1857,11 +1857,12 @@
     localStorage.removeItem(AUTH_KEY); localStorage.removeItem('ledgerloop-user');
     window.location.href = 'landing.html';
   }
-  function showView(name) {
+  function showView(name, opts) {
+    const resetScroll = !opts || opts.resetScroll !== false;
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + name)?.classList.add('active');
     document.title = name === 'app' ? 'LedgerLoop — app' : name === 'login' ? 'LedgerLoop — sign in' : 'LedgerLoop — UK reseller tax & inventory';
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (resetScroll) window.scrollTo({ top: 0, behavior: 'instant' });
     if (window.lucide) lucide.createIcons();
     if (name === 'app') {
       setTimeout(() => { if (!earningsChart) buildChart('revenue'); }, 50);
@@ -1879,12 +1880,22 @@
     }
     if (onLanding) {
       const hash = location.hash || '#/';
+      const landingEl = document.getElementById('view-landing');
+      const loginEl = document.getElementById('view-login');
+      const onLoginView = !!loginEl?.classList.contains('active');
+      const onLandingView = !!landingEl?.classList.contains('active');
       if (hash.startsWith('#/login')) {
         if (isAuthed()) { window.location.href = 'dashboard.html'; return; }
         showView('login');
-      } else {
-        showView('landing');
+        return;
       }
+      // In-page section links (#features, #how, …) must not reset scroll.
+      if (onLoginView || !onLandingView) {
+        showView('landing');
+      } else if (hash === '#/' || hash === '#' || hash === '') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      if (window.lucide) lucide.createIcons();
     }
   }
   // Login form only exists on landing.html — guard the listener.

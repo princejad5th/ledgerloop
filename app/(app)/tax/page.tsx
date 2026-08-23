@@ -87,7 +87,7 @@ export default async function TaxPage({ searchParams }: PageProps) {
       )}
       {!breakdown.flags.overVatThreshold && breakdown.flags.nearVatThreshold && (
         <div className="rounded-md border border-amber-300/50 bg-amber-50/50 dark:bg-amber-950/20 px-4 py-3 text-sm">
-          You're within 10% of the VAT registration threshold (£
+          You are within 10% of the VAT registration threshold (£
           {Number(rates.vatThreshold).toLocaleString('en-GB')}). Watch your rolling 12-month turnover.
         </div>
       )}

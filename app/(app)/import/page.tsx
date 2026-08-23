@@ -31,7 +31,7 @@ export default function ImportPage() {
           </li>
         </ol>
         <p className="mt-4 text-xs text-muted-foreground">
-          We support the current Seller Hub layout only. If you're on a legacy export,
+          We support the current Seller Hub layout only. If you are on a legacy export,
           please re-request via the Reports tab. See{' '}
           <Link href="/help" className="underline">help</Link> for screenshots.
         </p>

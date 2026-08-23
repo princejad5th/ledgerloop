@@ -4,63 +4,64 @@
 
 @layer base {
   :root {
-    --background: 60 9% 98%;          /* stone-50 */
-    --foreground: 222 47% 11%;        /* slate-900 */
+    /* Match landing.html / dashboard.html brand: warm stone + orange */
+    --background: 60 9% 98%;          /* #FAFAF9 stone-50 */
+    --foreground: 24 10% 10%;         /* #1C1917 stone-900 */
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 24 10% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 24 10% 10%;
 
-    --primary: 222 47% 11%;           /* slate-900 */
-    --primary-foreground: 60 9% 98%;
+    --primary: 25 95% 53%;            /* #F97316 brand-500 */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 60 5% 96%;           /* stone-100 */
+    --secondary-foreground: 24 10% 10%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 60 5% 96%;
+    --muted-foreground: 25 5% 45%;
 
-    --accent: 220 14% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 33 100% 96%;            /* brand-50 #FFF7ED */
+    --accent-foreground: 15 75% 34%;  /* brand-800 */
 
-    --destructive: 351 89% 60%;       /* rose-500 */
-    --destructive-foreground: 60 9% 98%;
+    --destructive: 347 77% 60%;       /* #F43F5E loss */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 222 47% 11%;
+    --border: 24 6% 90%;
+    --input: 24 6% 90%;
+    --ring: 25 95% 53%;
   }
 
   .dark {
-    --background: 0 0% 4%;            /* near-black */
+    --background: 24 10% 4%;
     --foreground: 60 9% 98%;
 
-    --card: 0 0% 8%;
+    --card: 24 10% 8%;
     --card-foreground: 60 9% 98%;
 
-    --popover: 0 0% 8%;
+    --popover: 24 10% 8%;
     --popover-foreground: 60 9% 98%;
 
-    --primary: 60 9% 98%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 25 95% 53%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 12%;
+    --secondary: 24 6% 14%;
     --secondary-foreground: 60 9% 98%;
 
-    --muted: 0 0% 12%;
-    --muted-foreground: 220 9% 65%;
+    --muted: 24 6% 14%;
+    --muted-foreground: 25 5% 64%;
 
-    --accent: 0 0% 12%;
+    --accent: 24 6% 14%;
     --accent-foreground: 60 9% 98%;
 
-    --destructive: 351 89% 60%;
-    --destructive-foreground: 60 9% 98%;
+    --destructive: 347 77% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 60 9% 98%;
+    --border: 24 6% 18%;
+    --input: 24 6% 18%;
+    --ring: 25 95% 53%;
   }
 }
 
@@ -71,7 +72,7 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1;
   }
   .tabular-nums {
     font-variant-numeric: tabular-nums;

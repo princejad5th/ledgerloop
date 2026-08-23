@@ -23,9 +23,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="h-16 border-b flex items-center px-4">
           <Link href="/app" className="flex items-center gap-2 font-semibold">
             <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
-              <rect width="32" height="32" rx="8" fill="hsl(var(--primary))" />
-              <path d="M9 9v14h14" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="20" cy="13" r="2" fill="hsl(var(--primary-foreground))" />
+              <rect width="32" height="32" rx="8" fill="#F97316" />
+              <path d="M9 9v14h14" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="20" cy="13" r="2" fill="#FFFFFF" />
             </svg>
             LedgerLoop
           </Link>

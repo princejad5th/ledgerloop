@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LedgerLoop — UK reseller tax & inventory. Built for eBay, Etsy &amp; Depop.</title>
+<meta name="description" content="Drop in your eBay, Etsy or Depop CSV and get HMRC SA103S figures in 60 seconds. Tax automation for UK resellers.">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- jsPDF (client-side PDF generation) + AutoTable plugin (table layout). Used by downloadSa103Pdf. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<!-- SheetJS — client-side Excel workbook generation. Used by downloadAccountantPack. -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script>
+  // No-flash: apply the saved theme before Tailwind/Tailwind classes paint.
+  try {
+    if (localStorage.getItem('ledgerloop-theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  } catch {}
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        },
+        colors: {
+          brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C',800:'#9A3412',900:'#7C2D12' },
+          stone: { 50:'#FAFAF9',100:'#F5F5F4',200:'#E7E5E4',300:'#D6D3D1',400:'#A8A29E',500:'#78716C',600:'#57534E',700:'#44403C',800:'#292524',900:'#1C1917',950:'#0C0A09' },
+          profit:'#10B981', loss:'#F43F5E',
+        },
+        boxShadow: {
+          soft:'0 1px 2px rgba(28,25,23,0.04), 0 0 0 1px rgba(28,25,23,0.04)',
+          card:'0 1px 3px rgba(28,25,23,0.06), 0 1px 2px rgba(28,25,23,0.04)',
+          glow:'0 30px 60px -25px rgba(249,115,22,0.35)',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html { font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1; scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    background: #FAFAF9; color: #1C1917; overflow-x: hidden;
+  }
+  .mono, .tabular { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .container-x { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .view { display: none; } .view.active { display: block; }
+  .tab-panel { display: none; } .tab-panel.active { display: block; }
+
+  /* Nav */
+  .nav-blur { backdrop-filter: saturate(180%) blur(14px); background: rgba(255,255,255,0.82); }
+
+  /* Type */
+  .h-display { font-weight: 700; letter-spacing: -0.025em; line-height: 1.05; }
+  .h-section { font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+  .grad-text {
+    background: linear-gradient(135deg, #F97316 0%, #EA580C 60%, #9A3412 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  /* Section backgrounds — each section has its own subtle treatment for visual rhythm */
+  .bg-hero {
+    background:
+      radial-gradient(1000px 600px at 80% 0%, rgba(249,115,22,0.10), transparent 60%),
+      radial-gradient(800px 500px at 10% 90%, rgba(249,115,22,0.06), transparent 60%),
+      linear-gradient(180deg, #FFFBF5 0%, #FFFFFF 100%);
+  }
+  .bg-cream  { background: linear-gradient(180deg, #FFFFFF 0%, #FFF7ED 50%, #FFFFFF 100%); }
+  .bg-warm   { background: #FFFBF5; }
+  .bg-amber-tint {
+    background:
+      radial-gradient(800px 400px at 50% 0%, rgba(249,115,22,0.05), transparent 70%),
+      #FFFBF5;
+  }
+  .bg-white-clean { background: #FFFFFF; }
+  .bg-stone-soft { background: linear-gradient(180deg, #FAFAF9 0%, #FFFFFF 100%); }
+
+  /* Divider with brand tint */
+  .divider-brand {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #FED7AA 20%, #FB923C 50%, #FED7AA 80%, transparent 100%);
+  }
+
+  /* Buttons */
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:0 18px; height:44px; border-radius:10px; font-size:15px; font-weight:500; cursor:pointer; transition: all 150ms cubic-bezier(.4,0,.2,1); white-space:nowrap; }
+  .btn-sm { height:36px; padding:0 14px; font-size:14px; }
+  .btn-lg { height:52px; padding:0 24px; font-size:16px; }
+  .btn-primary {
+    background:#F97316; color:#FFFFFF;
+    box-shadow: 0 1px 2px rgba(249,115,22,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  .btn-primary:hover { background:#EA580C; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(249,115,22,0.35), inset 0 1px 0 rgba(255,255,255,0.15); }
+  .btn-outline { background:#FFFFFF; color:#1C1917; border:1px solid #E7E5E4; }
+  .btn-outline:hover { background:#FAFAF9; border-color:#D6D3D1; }
+  .btn-ghost { background:transparent; color:#44403C; }
+  .btn-ghost:hover { background:#F5F5F4; color:#1C1917; }
+
+  /* Cards */
+  .card { background:#FFFFFF; border:1px solid #E7E5E4; border-radius:16px; }
+  .card-tight { background:#FFFFFF; border:1px solid #E7E5E4; border-radius:12px; }
+  .card-feature {
+    background:#FFFFFF;
+    border:1px solid #E7E5E4;
+    border-radius:16px;
+    transition: all 200ms;
+  }
+  .card-feature:hover { border-color: #FED7AA; transform: translateY(-2px); box-shadow: 0 12px 32px -16px rgba(249,115,22,0.25); }
+
+  /* Badges */
+  .badge { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:9999px; font-size:12px; font-weight:500; }
+  .badge-brand   { background:#FFEDD5; color:#9A3412; }
+  .badge-brand-outline { background:#FFFFFF; color:#9A3412; border:1px solid #FED7AA; }
+  .badge-success { background:rgba(16,185,129,0.1); color:#047857; }
+  .badge-soft    { background:#F5F5F4; color:#44403C; }
+  .badge-dot::before { content:''; width:6px; height:6px; border-radius:999px; background:currentColor; }
+
+  /* Inputs */
+  .input { width:100%; padding:10px 14px; border:1px solid #E7E5E4; border-radius:10px; font-size:15px; background:#FFFFFF; color:#1C1917; transition: all 150ms; }
+  .input:focus { outline:none; border-color:#F97316; box-shadow: 0 0 0 4px rgba(249,115,22,0.12); }
+  .input::placeholder { color:#A8A29E; }
+
+  /* App nav */
+  .nav-link { display:flex; align-items:center; gap:12px; padding:9px 12px; border-radius:10px; font-size:14px; font-weight:500; color:#57534E; cursor:pointer; transition: all 120ms; text-decoration:none; }
+  .nav-link:hover { background:#FFF7ED; color:#9A3412; }
+  .nav-link.active { background:#FFEDD5; color:#9A3412; }
+
+  /* Wordmark */
+  .wordmark { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:9px;
+    background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); color:#FFFFFF;
+    box-shadow: 0 1px 2px rgba(249,115,22,0.3), inset 0 1px 0 rgba(255,255,255,0.2); }
+  .wordmark-sm { width:28px; height:28px; border-radius:8px; }
+
+  /* Pricing */
+  .price-card-featured {
+    background: linear-gradient(180deg, #FFFBF5 0%, #FFFFFF 70%);
+    border: 1.5px solid #F97316;
+    box-shadow: 0 30px 60px -25px rgba(249,115,22,0.35);
+    position: relative;
+    transform: scale(1.02);
+  }
+
+  /* Reveal */
+  .reveal { opacity:0; transform:translateY(20px); transition: opacity 700ms ease, transform 700ms ease; }
+  .reveal.in { opacity:1; transform:translateY(0); }
+
+  /* Status badges */
+  .status-badge { display:inline-flex; align-items:center; padding:2px 10px; border-radius:9999px; font-size:11px; font-weight:500; }
+  .status-SOLD { background:rgba(16,185,129,0.1); color:#047857; }
+  .status-LISTED { background:#FFEDD5; color:#9A3412; }
+  .status-IN_STOCK { background:#DBEAFE; color:#1E40AF; }
+  .status-RETURNED { background:rgba(244,63,94,0.1); color:#BE123C; }
+
+  /* SA103 rows */
+  .sa103-row { display:grid; grid-template-columns:80px 1fr auto; gap:16px; padding:16px 20px; align-items:baseline; transition: background 120ms; }
+  .sa103-row:hover { background:#FFFBF5; }
+
+  /* Drop zone */
+  .dropzone { border:2px dashed #E7E5E4; border-radius:16px; padding:48px 24px; text-align:center; transition: all 150ms; background:#FAFAF9; }
+  .dropzone:hover, .dropzone.dropzone-active { border-color:#F97316; background:#FFF7ED; }
+
+  /* FAQ */
+  .faq-item summary { cursor:pointer; list-style:none; padding:20px 0; display:flex; justify-content:space-between; align-items:center; gap:16px; }
+  .faq-item summary::-webkit-details-marker { display:none; }
+  .faq-item summary .chev { transition: transform 200ms; }
+  .faq-item[open] summary .chev { transform: rotate(180deg); }
+
+  /* Section padding */
+  .section { padding: 96px 0; }
+  @media (max-width: 768px) {
+    .section { padding: 64px 0; }
+    .h-display { font-size: 40px !important; }
+    .price-card-featured { transform: none; }
+  }
+
+  /* Focus */
+  button:focus, a:focus, summary:focus { outline:none; }
+  button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid #F97316; outline-offset:3px; border-radius:6px; }
+
+  .sticky-header { position: sticky; top: 0; z-index: 50; }
+
+  /* Subtle pattern for hero (very faint) */
+  .pattern-overlay {
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(249, 115, 22, 0.07) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+
+  /* Platform pill */
+  .platform-pill {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 14px;
+    background:#FFFFFF;
+    border:1px solid #E7E5E4;
+    border-radius:10px;
+    font-size:14px; font-weight:500;
+    transition: all 200ms;
+  }
+  .platform-pill:hover { border-color:#FED7AA; background:#FFFBF5; }
+  .platform-pill .pp-icon { width: 20px; height: 20px; border-radius:5px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:10px; color:white; }
+
+  /* Stat highlight (replacement for the deleted fake stats) */
+  .benefit-card {
+    background: linear-gradient(180deg, #FFFFFF 0%, #FFFBF5 100%);
+    border: 1px solid #FED7AA;
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 200ms;
+  }
+  .benefit-card:hover { border-color: #FB923C; transform: translateY(-2px); box-shadow: 0 16px 36px -16px rgba(249,115,22,0.25); }
+
+  /* Chart container */
+  .chart-wrap { position: relative; height: 280px; }
+
+  /* Chart filters — platform pills + month select */
+  .chart-filter-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    padding: 12px 14px; margin-bottom: 18px;
+    background: #FAFAF9; border: 1px solid #E7E5E4; border-radius: 12px;
+  }
+  .chart-filter-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; color: #78716C;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .chart-platform-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 8px;
+    font-size: 12px; font-weight: 500;
+    background: #FFFFFF; color: #57534E;
+    border: 1px solid #E7E5E4;
+    cursor: pointer; transition: all 120ms;
+  }
+  .chart-platform-pill:hover { background: #F5F5F4; color: #1C1917; border-color: #D6D3D1; }
+  .chart-platform-pill.active { background: #1C1917; color: #FAFAF9; border-color: #1C1917; }
+  .chart-platform-pill .pp-icon { width: 16px; height: 16px; border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 9px; color: white; }
+  .chart-platform-pill:not(.active) .pp-icon { opacity: 0.75; }
+  .chart-platform-pill:disabled { cursor: not-allowed; opacity: 0.5; }
+  .chart-month-select {
+    font-size: 13px; padding: 6px 30px 6px 10px;
+    border: 1px solid #E7E5E4; border-radius: 8px;
+    background-color: #FFFFFF; color: #1C1917; cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378716C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+  .chart-month-select:focus { outline: none; border-color: #F97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.15); }
+  .chart-filter-reset {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; color: #78716C;
+    background: transparent; border: none; cursor: pointer;
+    padding: 4px 8px; border-radius: 6px;
+    transition: all 120ms;
+  }
+  .chart-filter-reset:hover { color: #C2410C; background: #FFF7ED; }
+  .dark .chart-filter-bar { background: #172033; border-color: #1F2A3F; }
+  .dark .chart-filter-label { color: #94A3B8; }
+  .dark .chart-platform-pill { background: #1E293B; color: #94A3B8; border-color: #334155; }
+  .dark .chart-platform-pill:hover { background: #2A3A52; color: #F1F5F9; border-color: #475569; }
+  .dark .chart-platform-pill.active { background: #F1F5F9; color: #0F172A; border-color: #F1F5F9; }
+  .dark .chart-month-select { background-color: #1E293B; color: #F1F5F9; border-color: #475569; }
+  .dark .chart-filter-reset:hover { background: rgba(249,115,22,0.1); color: #FB923C; }
+
+  /* ---------- Inventory editor ---------- */
+  .inv-toolbar {
+    background: linear-gradient(180deg, #FFFBF5 0%, #FFF7ED 100%);
+    border: 1px solid #FED7AA; border-radius: 12px;
+    padding: 14px 18px;
+  }
+  .inv-filter-pill {
+    padding: 6px 12px; border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 120ms;
+    border: none; background: transparent; color: #57534E;
+  }
+  .inv-filter-pill:hover { background: #F5F5F4; color: #1C1917; }
+  .inv-filter-pill.active { background: #1C1917; color: #FAFAF9; }
+  .inv-bulk-bar {
+    background: linear-gradient(135deg, #F97316 0%, #C2410C 100%);
+    color: #FFFFFF;
+    padding: 14px 18px; border-radius: 12px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    box-shadow: 0 12px 28px -10px rgba(249,115,22,0.45);
+    animation: bulk-in 200ms ease;
+  }
+  @keyframes bulk-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+  .bulk-input {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 7px; padding: 5px 10px; width: 100px;
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #FFFFFF;
+  }
+  .bulk-input::placeholder { color: rgba(255,255,255,0.55); }
+  .bulk-input:focus { outline: none; background: rgba(255,255,255,0.28); border-color: rgba(255,255,255,0.55); }
+  .btn-on-orange { background: #FFFFFF !important; color: #9A3412 !important; }
+  .btn-on-orange:hover { background: #FFF7ED !important; transform: none !important; box-shadow: none !important; }
+
+  .row-selected { background: #FFF7ED !important; }
+  .row-selected:hover { background: #FFEDD5 !important; }
+  .row-needs-cost { background: #FFFBF5; }
+
+  .cost-cell {
+    display: inline-flex; align-items: center; justify-content: flex-end;
+    min-width: 110px; padding: 5px 10px; border-radius: 7px;
+    cursor: cell; transition: all 120ms;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    border: 1px solid transparent;
+  }
+  .cost-cell:hover { background: #FFF7ED; border-color: #FED7AA; }
+  .cost-cell.empty {
+    color: #A8A29E; font-family: 'Inter', sans-serif; font-style: italic; font-size: 12px;
+    border: 1px dashed #D6D3D1; background: #FFFFFF;
+  }
+  .cost-cell.empty:hover { border-color: #F97316; color: #9A3412; background: #FFF7ED; font-style: normal; }
+  .cost-cell.suggested {
+    color: #A8A29E; font-style: normal;
+    border: 1px dashed #FED7AA; background: #FFFBF5;
+  }
+  .cost-cell.suggested::before { content: '✦'; font-size: 10px; margin-right: 4px; color: #FB923C; }
+  .cost-cell.suggested:hover { color: #9A3412; background: #FFEDD5; border-color: #FB923C; }
+  .cost-cell.editing {
+    background: #FFFFFF;
+    border: 1px solid #F97316;
+    box-shadow: 0 0 0 3px rgba(249,115,22,0.15);
+    padding: 4px 9px;
+  }
+  .cost-cell.editing::before { display: none; }
+  .cost-cell input {
+    width: 100%; min-width: 70px; padding: 0;
+    border: none; outline: none; background: transparent; text-align: right;
+    font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
+    font-size: 14px; color: #1C1917; -moz-appearance: textfield;
+  }
+  .cost-cell input::-webkit-outer-spin-button,
+  .cost-cell input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .cost-cell .cur { color: #A8A29E; margin-right: 3px; font-family: 'JetBrains Mono', monospace; }
+
+  input[type="checkbox"].inv-check {
+    width: 16px; height: 16px; border-radius: 4px; cursor: pointer; accent-color: #F97316;
+  }
+  /* Sortable column header — click to sort */
+  .inv-sort-header {
+    cursor: pointer;
+    user-select: none;
+    transition: color 120ms, background-color 120ms;
+  }
+  .inv-sort-header:hover { color: #1C1917; background-color: #F5F5F4; }
+  .inv-sort-header.sorted { color: #1C1917; }
+  .dark .inv-sort-header:hover { color: #F1F5F9; background-color: #2A3A52; }
+  .dark .inv-sort-header.sorted { color: #F1F5F9; }
+  .inv-sort-header-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  th.text-right .inv-sort-header-inner { justify-content: flex-end; width: 100%; }
+  .inv-sort-arrow {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 12px; height: 12px;
+    opacity: 0;
+    color: #A8A29E;
+    transition: opacity 120ms, color 120ms;
+  }
+  .inv-sort-header:hover .inv-sort-arrow { opacity: 0.55; }
+  .inv-sort-arrow.active {
+    opacity: 1 !important;
+    color: #F97316;
+  }
+  .dark .inv-sort-arrow { color: #64748B; }
+  .dark .inv-sort-arrow.active { color: #FB923C; }
+  .profit-fee-note {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #A8A29E;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Help tooltip */
+  .ll-help { position: relative; display: inline-flex; color: #A8A29E; cursor: help; vertical-align: middle; }
+  .ll-help:hover, .ll-help:focus { color: #C2410C; outline: none; }
+  .ll-tip {
+    position: absolute; top: calc(100% + 10px); right: 0;
+    width: 300px; max-width: min(320px, 90vw);
+    background: #1C1917; color: #FAFAF9;
+    font-size: 12px; line-height: 1.55; font-weight: 400;
+    padding: 12px 14px; border-radius: 8px;
+    box-shadow: 0 12px 28px -10px rgba(28,25,23,0.45);
+    opacity: 0; visibility: hidden; transform: translateY(-4px);
+    transition: opacity 150ms, visibility 150ms, transform 150ms;
+    z-index: 30; pointer-events: none;
+    text-align: left;
+  }
+  /* Default: right-anchored (arrow on the right). Add `.left` to anchor left
+     (arrow on the left) or `.center` to centre horizontally. */
+  .ll-tip.left   { right: auto; left: 0; }
+  .ll-tip.center { right: auto; left: 50%; transform: translateX(-50%) translateY(-4px); }
+  /* Tip arrow */
+  .ll-tip::before {
+    content: ''; position: absolute; top: -5px; right: 13px;
+    width: 10px; height: 10px; background: #1C1917; transform: rotate(45deg);
+  }
+  .ll-tip.left::before   { right: auto; left: 13px; }
+  .ll-tip.center::before { right: auto; left: 50%; margin-left: -5px; }
+  .ll-help:hover .ll-tip, .ll-help:focus .ll-tip {
+    opacity: 1; visibility: visible; transform: translateY(0);
+    pointer-events: auto;
+  }
+  .ll-help:hover .ll-tip.center, .ll-help:focus .ll-tip.center {
+    transform: translateX(-50%) translateY(0);
+  }
+  .ll-tip strong { color: #FED7AA; font-weight: 600; }
+  .ll-tip .ll-tip-source {
+    display: block; margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid rgba(250,250,249,0.12);
+    color: #A8A29E; font-size: 11px;
+  }
+  /* Scenario card selected / recommended states */
+  .scenario-btn.selected { border-color: #F97316 !important; background: #FFF7ED !important; }
+  .scenario-btn.recommended:not(.selected) { border-color: #FED7AA !important; background: #FFFBF5 !important; }
+  .scenario-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 500; }
+  .scenario-pill.selected   { background: #F97316; color: #FFFFFF; }
+  .scenario-pill.recommended { background: rgba(16,185,129,0.1); color: #047857; }
+  .kbd {
+    display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px;
+    background: #FFFFFF; border: 1px solid #E7E5E4;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #44403C;
+    box-shadow: 0 1px 0 #E7E5E4;
+  }
+  .margin-slider {
+    -webkit-appearance: none; appearance: none;
+    width: 110px; height: 6px; border-radius: 999px; cursor: pointer;
+    background: linear-gradient(90deg, #FB923C var(--fill, 50%), #F5F5F4 var(--fill, 50%));
+  }
+  .margin-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #FFFFFF; border: 2px solid #F97316;
+    box-shadow: 0 1px 4px rgba(249,115,22,0.4);
+  }
+  .margin-slider:focus { outline: none; }
+  .margin-slider:focus::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(249,115,22,0.2); }
+
+  /* ---------- Calculator ---------- */
+  .calc-bg {
+    background:
+      radial-gradient(900px 500px at 90% 10%, rgba(249,115,22,0.08), transparent 60%),
+      radial-gradient(700px 400px at 10% 90%, rgba(249,115,22,0.05), transparent 60%),
+      linear-gradient(180deg, #FFFFFF 0%, #FFFBF5 50%, #FFFFFF 100%);
+  }
+  .calc-output-bg {
+    background: linear-gradient(160deg, #FFFFFF 0%, #FFF7ED 100%);
+    border: 1px solid #FED7AA;
+  }
+  .calc-headline {
+    font-feature-settings: 'tnum';
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  /* Custom slider — orange thumb, soft track */
+  input[type="range"].calc-slider {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; background: transparent; cursor: pointer; height: 24px;
+  }
+  input[type="range"].calc-slider::-webkit-slider-runnable-track {
+    background: linear-gradient(90deg, #FB923C var(--fill, 50%), #F5F5F4 var(--fill, 50%));
+    height: 6px; border-radius: 999px;
+  }
+  input[type="range"].calc-slider::-moz-range-track {
+    background: linear-gradient(90deg, #FB923C var(--fill, 50%), #F5F5F4 var(--fill, 50%));
+    height: 6px; border-radius: 999px;
+  }
+  input[type="range"].calc-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 20px; height: 20px; border-radius: 50%; margin-top: -7px;
+    background: #FFFFFF; border: 2px solid #F97316;
+    box-shadow: 0 1px 4px rgba(249,115,22,0.35);
+    transition: transform 120ms;
+  }
+  input[type="range"].calc-slider::-moz-range-thumb {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #FFFFFF; border: 2px solid #F97316;
+    box-shadow: 0 1px 4px rgba(249,115,22,0.35);
+  }
+  input[type="range"].calc-slider:hover::-webkit-slider-thumb { transform: scale(1.1); }
+  input[type="range"].calc-slider:focus { outline: none; }
+  input[type="range"].calc-slider:focus::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(249,115,22,0.2); }
+  /* Number-style input alongside slider */
+  .calc-num-input {
+    width: 110px; text-align: right; padding: 6px 10px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid #E7E5E4; border-radius: 8px; font-size: 14px;
+    background: #FFFFFF; color: #1C1917;
+  }
+  .calc-num-input:focus { outline: none; border-color: #F97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.15); }
+  /* Year toggle */
+  .calc-year-btn {
+    flex: 1; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    background: transparent; color: #57534E; cursor: pointer; transition: all 120ms;
+  }
+  .calc-year-btn.active { background: #FFFFFF; color: #1C1917; box-shadow: 0 1px 2px rgba(28,25,23,0.08); }
+  /* Breakdown bar — stacked segments */
+  .calc-breakdown {
+    width: 100%; height: 16px; border-radius: 999px; overflow: hidden;
+    display: flex; background: #F5F5F4;
+  }
+  .calc-segment { height: 100%; transition: flex 400ms cubic-bezier(.4,0,.2,1); }
+  /* Plan select */
+  .calc-select {
+    width: 100%; padding: 9px 12px; border: 1px solid #E7E5E4; border-radius: 10px;
+    font-size: 14px; background: #FFFFFF; color: #1C1917; transition: all 150ms;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378716C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat; background-position: right 12px center;
+    padding-right: 36px; cursor: pointer;
+  }
+  .calc-select:focus { outline: none; border-color: #F97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.15); }
+  /* Result line item */
+  .calc-line { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; }
+
+  /* ============================================================ */
+  /* Dark mode — soft slate-blue palette (à la GitHub Dark /       */
+  /* Linear). Easier on the eyes than near-black, and lets the     */
+  /* brand orange pop without fighting the surface colour.         */
+  /* ------------------------------------------------------------- */
+  /*   #0F172A  body                slate-900                      */
+  /*   #172033  sub-surface         (between slate-900 & 800)      */
+  /*   #1E293B  card / sheet        slate-800                      */
+  /*   #2A3A52  hover / elevated                                    */
+  /*   #1F2A3F  border subtle                                       */
+  /*   #334155  border medium       slate-700                      */
+  /*   #475569  border strong       slate-600                      */
+  /*   #64748B  text muted          slate-500                      */
+  /*   #94A3B8  text subdued        slate-400                      */
+  /*   #CBD5E1  text body soft      slate-300                      */
+  /*   #E2E8F0  text body           slate-200                      */
+  /*   #F1F5F9  text heading        slate-100                      */
+  /* ============================================================ */
+  html.dark body { background: #0F172A; color: #F1F5F9; }
+
+  /* Tailwind utility overrides (only apply when html.dark is set) */
+  .dark .bg-white            { background-color: #1E293B !important; }
+  .dark .bg-stone-50         { background-color: #172033 !important; }
+  .dark .bg-stone-100        { background-color: #2A3A52 !important; }
+  .dark .bg-stone-200        { background-color: #3B4A66 !important; }
+  .dark .text-stone-400      { color: #64748B !important; }
+  .dark .text-stone-500      { color: #94A3B8 !important; }
+  .dark .text-stone-600      { color: #CBD5E1 !important; }
+  .dark .text-stone-700      { color: #E2E8F0 !important; }
+  .dark .text-stone-800      { color: #F1F5F9 !important; }
+  .dark .text-stone-900      { color: #F8FAFC !important; }
+  .dark .border-stone-200    { border-color: #1F2A3F !important; }
+  .dark .border-stone-300    { border-color: #334155 !important; }
+  .dark .divide-stone-200 > * + * { border-color: #1F2A3F !important; }
+  .dark .hover\:bg-stone-50:hover  { background-color: #2A3A52 !important; }
+  .dark .hover\:bg-brand-50\/50:hover { background-color: rgba(255, 247, 237, 0.05) !important; }
+
+  /* Custom component classes */
+  .dark .card,
+  .dark .card-tight          { background: #1E293B; border-color: #1F2A3F; color: #F1F5F9; }
+  .dark .btn-outline         { background: #1E293B; color: #F1F5F9; border-color: #475569; }
+  .dark .btn-outline:hover   { background: #2A3A52; border-color: #64748B; }
+  .dark .btn-ghost           { color: #F1F5F9; }
+  .dark .btn-ghost:hover     { background: #2A3A52; }
+  .dark .input               { background: #1E293B; color: #F1F5F9; border-color: #475569; }
+  .dark .input:focus         { border-color: #FB923C; }
+  .dark .nav-link            { color: #94A3B8; }
+  .dark .nav-link:hover      { background: #2A3A52; color: #FB923C; }
+  .dark .nav-link.active     { background: rgba(249, 115, 22, 0.15); color: #FB923C; }
+  .dark .inv-toolbar         { background: #1E293B; border-color: #334155; }
+  .dark .inv-filter-pill     { color: #94A3B8; }
+  .dark .inv-filter-pill:hover { background: #2A3A52; color: #F1F5F9; }
+  .dark .inv-filter-pill.active { background: #F1F5F9; color: #0F172A; }
+  .dark .cost-cell:hover     { background: rgba(249, 115, 22, 0.1); border-color: #C2410C; }
+  .dark .cost-cell.empty     { background: #1E293B; border-color: #475569; color: #64748B; }
+  .dark .cost-cell.empty:hover { background: rgba(249, 115, 22, 0.1); border-color: #FB923C; color: #FB923C; }
+  .dark .cost-cell.suggested { background: rgba(254, 215, 170, 0.08); border-color: #9A3412; color: #94A3B8; }
+  .dark .cost-cell.editing   { background: #1E293B; color: #F1F5F9; }
+  .dark .cost-cell input     { color: #F1F5F9; }
+  .dark .cost-cell .cur      { color: #64748B; }
+  .dark .row-needs-cost      { background: rgba(254, 215, 170, 0.05); }
+  .dark .row-selected,
+  .dark .row-selected:hover  { background: rgba(249, 115, 22, 0.12) !important; }
+  .dark .sa103-row:hover     { background: rgba(15, 23, 42, 0.6); }
+  .dark .dropzone            { border-color: #475569; background: #172033; }
+  .dark .dropzone:hover      { border-color: #FB923C; background: rgba(249, 115, 22, 0.08); }
+  .dark .kbd                 { background: #2A3A52; border-color: #475569; color: #E2E8F0; box-shadow: 0 1px 0 #0F172A; }
+  .dark .scenario-btn        { background: #1E293B !important; border-color: #475569 !important; }
+  .dark .scenario-btn:hover  { background: rgba(249, 115, 22, 0.06) !important; border-color: #C2410C !important; }
+  .dark .scenario-btn.selected { background: rgba(249, 115, 22, 0.15) !important; border-color: #FB923C !important; }
+  .dark .scenario-btn.recommended:not(.selected) { background: rgba(254, 215, 170, 0.06) !important; border-color: #9A3412 !important; }
+  .dark .h-section,
+  .dark .h-display           { color: #F1F5F9; }
+  .dark .text-foreground     { color: #F1F5F9; }
+  .dark .margin-slider       { background: linear-gradient(90deg, #FB923C var(--fill, 50%), #475569 var(--fill, 50%)); }
+  .dark .ll-tip              { background: #F1F5F9; color: #0F172A; box-shadow: 0 12px 28px -10px rgba(0,0,0,0.55); }
+  .dark .ll-tip::before      { background: #F1F5F9; }
+  .dark .ll-tip strong       { color: #9A3412; }
+  .dark .ll-tip .ll-tip-source { color: #475569; border-top-color: rgba(15,23,42,0.15); }
+  .dark .pill-count          { color: #64748B !important; }
+  .dark .profit-fee-note     { color: #64748B; }
+  .dark .bulk-input          { background: rgba(0,0,0,0.25); color: #FFFFFF; border-color: rgba(255,255,255,0.25); }
+
+  /* Banners that already use orange tints — keep but soften for dark */
+  .dark [style*="background:#FFF7ED"],
+  .dark [style*="background: #FFF7ED"] { background: rgba(249, 115, 22, 0.08) !important; color: #FED7AA; }
+  .dark [style*="border:1px solid #FED7AA"],
+  .dark [style*="border: 1px solid #FED7AA"] { border-color: rgba(254, 215, 170, 0.35) !important; }
+
+  /* Theme toggle button */
+  .theme-toggle { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; border: 1px solid #E7E5E4; background: #FFFFFF; color: #44403C; cursor: pointer; transition: all 120ms; }
+  .theme-toggle:hover { border-color: #F97316; color: #C2410C; }
+  .dark .theme-toggle { background: #1E293B; border-color: #475569; color: #FDBA74; }
+  .dark .theme-toggle:hover { border-color: #FB923C; color: #FB923C; }
+  .theme-toggle .icon-sun { display: inline-flex; }
+  .theme-toggle .icon-moon { display: none; }
+  .dark .theme-toggle .icon-sun { display: none; }
+  .dark .theme-toggle .icon-moon { display: inline-flex; }
+</style>
+</head>
+<body>
+
+<div id="view-app" class="view">
+  <div class="grid min-h-screen" style="grid-template-columns:248px 1fr;">
+    <aside class="bg-white border-r border-stone-200 flex flex-col">
+      <div class="h-16 px-5 flex items-center gap-2.5 border-b border-stone-200 font-semibold">
+        <span class="wordmark wordmark-sm">
+          <svg width="14" height="14" viewBox="0 0 32 32" fill="none">
+            <path d="M9 9v14h14" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="20" cy="13" r="2" fill="currentColor"/>
+          </svg>
+        </span>
+        LedgerLoop
+      </div>
+      <nav class="flex-1 p-3 space-y-0.5">
+        <a class="nav-link active" data-tab="dashboard"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a>
+        <a class="nav-link" data-tab="inventory"><i data-lucide="boxes" class="w-4 h-4"></i> Inventory</a>
+        <a class="nav-link" data-tab="import"><i data-lucide="upload" class="w-4 h-4"></i> Import</a>
+        <a class="nav-link" data-tab="tax"><i data-lucide="receipt" class="w-4 h-4"></i> Tax</a>
+        <a class="nav-link" data-tab="settings"><i data-lucide="settings" class="w-4 h-4"></i> Settings</a>
+      </nav>
+      <div class="p-3 border-t border-stone-200">
+        <button class="nav-link w-full" onclick="signOut()">
+          <i data-lucide="log-out" class="w-4 h-4"></i> Sign out
+        </button>
+      </div>
+    </aside>
+
+    <div class="flex flex-col min-w-0 bg-stone-50">
+      <header class="h-16 px-8 flex items-center justify-between border-b border-stone-200 bg-white">
+        <div class="text-sm text-stone-500">
+          Signed in as <span class="text-stone-800 mono" id="who">test</span>
+        </div>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light / dark mode" title="Toggle theme">
+          <span class="icon-sun"><i data-lucide="sun" class="w-4 h-4"></i></span>
+          <span class="icon-moon"><i data-lucide="moon" class="w-4 h-4"></i></span>
+        </button>
+        <button onclick="signOut()" class="btn btn-ghost btn-sm">
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          Back to site
+        </button>
+      </header>
+
+      <main class="flex-1 p-8 overflow-x-auto">
+
+        <!-- DASHBOARD with CHART -->
+        <section id="tab-dashboard" class="tab-panel active space-y-8">
+          <div id="import-nudge" class="rounded-xl px-4 py-3 text-sm flex items-center justify-between gap-4" style="background:#FFF7ED;border:1px solid #FED7AA;">
+            <span class="flex items-center gap-2">
+              <i data-lucide="upload-cloud" class="w-4 h-4 text-brand-700"></i>
+              No sales data yet — import your eBay, Etsy or Depop CSV to see your real figures here.
+            </span>
+            <button class="btn btn-outline btn-sm" onclick="switchTab('import')">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+              Import CSV
+            </button>
+          </div>
+
+          <header class="flex items-end justify-between flex-wrap gap-4">
+            <div>
+              <h1 class="h-section text-3xl">Dashboard</h1>
+              <p class="text-sm text-stone-500 mt-1" id="dash-header-sub">All time</p>
+            </div>
+            <div class="flex items-center gap-2" id="dash-year-selector">
+              <!-- populated by setupDashYearFilter() -->
+            </div>
+          </header>
+
+          <!-- Warning shown when items still need cost — derived from the same source of truth as everything else -->
+          <div id="dash-cost-warning" class="hidden rounded-xl px-4 py-3 text-sm flex items-center gap-3" style="background:#FFF7ED;border:1px solid #FED7AA;">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-brand-700 flex-shrink-0"></i>
+            <span><span id="dash-cost-warning-count">0</span> items still need a cost price — figures below assume £0 cost for those items, so your <strong>profit and tax estimate are too high</strong> until you fill them in.</span>
+          </div>
+
+          <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="card-tight p-5 relative">
+              <span class="ll-help absolute top-3 right-3" tabindex="0" aria-label="What does Turnover mean?">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                <span class="ll-tip"><strong>Turnover</strong> is your gross income from reselling — the total of every sale price (plus any shipping you charged the buyer) before any fees, refunds or costs are taken off. HMRC calls this <strong>Box 9</strong> on the SA103S form.<span class="ll-tip-source">Source: gov.uk SA103S notes, Box 9</span></span>
+              </span>
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Turnover</p>
+              <p class="mt-2 mono text-2xl font-semibold" id="dash-turnover">£0.00</p>
+              <p class="mt-2 text-xs text-stone-500" id="dash-sales-count">— sales</p>
+            </div>
+            <div class="card-tight p-5 relative">
+              <span class="ll-help absolute top-3 right-3" tabindex="0" aria-label="What counts as an allowable expense?">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                <span class="ll-tip"><strong>Allowable expenses</strong> are everything HMRC lets you deduct from your turnover: the cost you paid for the items (<strong>COGS</strong>), platform fees (eBay/Etsy/Depop selling + payment fees), postage labels you paid for, refunds issued, and general business costs like packaging or mileage logged on the Expenses page.<span class="ll-tip-source">Source: gov.uk/expenses-if-youre-self-employed</span></span>
+              </span>
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Allowable expenses</p>
+              <p class="mt-2 mono text-2xl font-semibold" id="dash-expenses">£0.00</p>
+              <p class="mt-2 text-xs text-stone-500">COGS + platform fees</p>
+            </div>
+            <div class="card-tight p-5 relative">
+              <span class="ll-help absolute top-3 right-3" tabindex="0" aria-label="What is trading profit?">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                <span class="ll-tip"><strong>Trading profit</strong> is what you actually made: turnover minus allowable expenses. This is the figure income tax and Class 4 National Insurance are calculated on. Goes into <strong>Box 21</strong> (net profit) and <strong>Box 31</strong> (taxable profit) on SA103S.<span class="ll-tip-source">Source: gov.uk SA103S notes, Boxes 21 &amp; 31</span></span>
+              </span>
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Trading profit</p>
+              <p class="mt-2 mono text-2xl font-semibold text-profit" id="dash-profit">£0.00</p>
+              <p class="mt-2 text-xs text-stone-500">Turnover − expenses</p>
+            </div>
+            <div class="card-tight p-5 relative">
+              <span class="ll-help absolute top-3 right-3" tabindex="0" aria-label="How is estimated tax calculated?">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                <span class="ll-tip"><strong>Estimated tax due</strong> is your total HMRC bill for this trading activity: income tax + Class 4 National Insurance + any student loan repayment. Stacked on top of your PAYE salary at your <strong>marginal rate</strong>, so reselling profit lands in the 20%, 40% or 45% band depending on what your day job already earns. Set your PAYE and student loan plan in Settings.<span class="ll-tip-source">Source: HMRC Self Assessment manual</span></span>
+              </span>
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Estimated tax due</p>
+              <p class="mt-2 mono text-2xl font-semibold" id="dash-tax">£0.00</p>
+              <p class="mt-2 text-xs text-stone-500">Income tax + Class 4 + SL</p>
+            </div>
+          </section>
+
+          <!-- EARNINGS CHART -->
+          <section class="card p-6">
+            <div class="flex items-end justify-between flex-wrap gap-4 mb-5">
+              <div>
+                <h2 class="font-semibold text-lg">Earnings over time</h2>
+                <p class="text-sm text-stone-500 mt-1">Monthly view across all platforms</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="inline-flex bg-stone-100 rounded-lg p-1" role="tablist" id="chart-metric-toggle">
+                  <button class="chart-toggle px-3 py-1.5 text-xs font-medium rounded-md bg-white text-stone-900 shadow-sm" data-metric="revenue">Revenue</button>
+                  <button class="chart-toggle px-3 py-1.5 text-xs font-medium rounded-md text-stone-500 hover:text-stone-800" data-metric="profit">Profit</button>
+                  <button class="chart-toggle px-3 py-1.5 text-xs font-medium rounded-md text-stone-500 hover:text-stone-800" data-metric="costs">Costs</button>
+                  <button class="chart-toggle px-3 py-1.5 text-xs font-medium rounded-md text-stone-500 hover:text-stone-800" data-metric="combined">All</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chart filters: platform multi-select + month -->
+            <div class="chart-filter-bar">
+              <span class="chart-filter-label">
+                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                Platforms
+              </span>
+              <div class="flex items-center gap-1.5" id="chart-platform-filter" role="group" aria-label="Filter platforms shown on chart">
+                <button class="chart-platform-pill active" data-platform="EBAY" type="button" aria-pressed="true">
+                  <span class="pp-icon" style="background:#0064D2">eb</span> eBay
+                </button>
+                <button class="chart-platform-pill active" data-platform="ETSY" type="button" aria-pressed="true">
+                  <span class="pp-icon" style="background:#F1641E">e</span> Etsy
+                </button>
+                <button class="chart-platform-pill active" data-platform="DEPOP" type="button" aria-pressed="true">
+                  <span class="pp-icon" style="background:#FF2300">D</span> Depop
+                </button>
+              </div>
+              <span class="h-5 w-px bg-stone-300"></span>
+              <label class="chart-filter-label" for="chart-month-filter">
+                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                Month
+              </label>
+              <select id="chart-month-filter" class="chart-month-select" aria-label="Filter chart by month">
+                <option value="">All months</option>
+              </select>
+              <button type="button" id="chart-filter-reset" class="chart-filter-reset ml-auto hidden">
+                <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+                Reset filters
+              </button>
+            </div>
+
+            <div class="chart-wrap">
+              <canvas id="earnings-chart"></canvas>
+            </div>
+            <div class="mt-5 pt-5 border-t border-stone-200 grid grid-cols-3 gap-4 text-sm">
+              <div>
+                <p class="text-xs text-stone-500">Total revenue</p>
+                <p class="mono font-semibold mt-1" id="chart-stat-revenue">£18,500.00</p>
+              </div>
+              <div>
+                <p class="text-xs text-stone-500">Total profit</p>
+                <p class="mono font-semibold mt-1 text-profit" id="chart-stat-profit">£8,600.00</p>
+              </div>
+              <div>
+                <p class="text-xs text-stone-500">Total costs</p>
+                <p class="mono font-semibold mt-1" id="chart-stat-costs">£9,900.00</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="grid gap-6 lg:grid-cols-[1fr_320px]">
+            <div class="card overflow-hidden">
+              <header class="bg-stone-50 px-5 py-3 border-b border-stone-200 flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">HMRC Self Assessment</p>
+                  <h2 class="font-semibold mt-1 flex items-center gap-2">
+                    SA103S — Self Employment (short)
+                    <span class="ll-help" tabindex="0" aria-label="What is the SA103S form?">
+                      <i data-lucide="help-circle" class="w-4 h-4"></i>
+                      <span class="ll-tip left"><strong>SA103S</strong> is the "Self-Employment (short)" supplementary page of the UK Self Assessment tax return. You file this alongside form <strong>SA100</strong> if your reselling turnover was under <strong>£90,000</strong> in the tax year. Above that you'd use SA103F (full). We map your figures straight to the boxes you'll need to type into HMRC's online portal.<span class="ll-tip-source">Source: gov.uk/self-assessment-forms-and-helpsheets</span></span>
+                    </span>
+                  </h2>
+                </div>
+                <span class="badge badge-success">Recommended path</span>
+              </header>
+              <div class="divide-y divide-stone-200">
+                <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 9</div><div><div class="text-sm font-medium">Your turnover</div><div class="text-xs text-stone-500 mt-1">Total sale prices plus shipping charged.</div></div><div class="mono font-medium" id="dash-sa103-9">£0.00</div></div>
+                <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 20</div><div><div class="text-sm font-medium">Total allowable expenses</div><div class="text-xs text-stone-500 mt-1">COGS + platform fees + postage + refunds.</div></div><div class="mono font-medium" id="dash-sa103-20">£0.00</div></div>
+                <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 21</div><div><div class="text-sm font-medium">Net profit</div><div class="text-xs text-stone-500 mt-1">Turnover − allowable expenses.</div></div><div class="mono font-medium" id="dash-sa103-21">£0.00</div></div>
+                <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 31</div><div><div class="text-sm font-medium">Total taxable profits</div></div><div class="mono font-medium" id="dash-sa103-31">£0.00</div></div>
+              </div>
+            </div>
+            <aside class="space-y-4">
+              <div class="card-tight p-5 relative">
+                <span class="ll-help absolute top-3 right-3" tabindex="0" aria-label="What does Platform mix show?">
+                  <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                  <span class="ll-tip"><strong>Platform mix</strong> shows how your total turnover splits across eBay, Depop and Etsy for this tax year. Helps you see which marketplace is pulling its weight — and whether it's worth doubling down on a winner or quietly stepping back from a poor performer.</span>
+                </span>
+                <h3 class="text-sm font-medium">Platform mix</h3>
+                <div class="mt-4 space-y-2.5 text-sm">
+                  <div class="flex justify-between items-center"><span class="font-semibold" style="color:#0064D2">eBay</span><span class="mono font-medium" id="mix-EBAY">£0</span></div>
+                  <div class="flex justify-between items-center"><span class="font-semibold" style="color:#FF2300">Depop</span><span class="mono font-medium" id="mix-DEPOP">£0</span></div>
+                  <div class="flex justify-between items-center"><span class="font-semibold" style="color:#F1641E">Etsy</span><span class="mono font-medium" id="mix-ETSY">£0</span></div>
+                </div>
+              </div>
+              <div class="card-tight p-5 relative">
+                <span class="ll-help absolute top-3 right-3" tabindex="0" aria-label="How is Avg ROI calculated?">
+                  <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                  <span class="ll-tip"><strong>Avg ROI</strong> = total profit ÷ total cost across every sold item where you've entered a cost (a portfolio-weighted return). <strong>100%</strong> means you doubled your money on average — for every £1 of stock you bought, you got £2 back. Resellers in good niches typically aim for 200%+ ROI net of fees. Items still missing a cost are excluded so they don't drag the figure to zero.</span>
+                </span>
+                <h3 class="text-sm font-medium">Portfolio</h3>
+                <div class="mt-4 space-y-2 text-xs text-stone-500">
+                  <div class="flex justify-between items-baseline"><span>Avg ROI</span><span class="mono text-stone-800" id="dash-avg-roi">—</span></div>
+                  <div class="text-xs text-stone-400" id="dash-avg-roi-note">No cost data yet</div>
+                </div>
+              </div>
+            </aside>
+          </section>
+        </section>
+
+        <!-- INVENTORY -->
+        <section id="tab-inventory" class="tab-panel space-y-5">
+          <header class="flex items-end justify-between flex-wrap gap-4">
+            <div>
+              <h1 class="h-section text-3xl">Inventory</h1>
+              <p class="text-sm text-stone-500 mt-1">
+                <span id="inv-count">14 sold items</span>
+                <span id="inv-needs-cost-pill" class="ml-1 inline-flex items-center gap-1.5 text-brand-700 font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                  <span id="inv-needs-cost-count">6 need cost</span>
+                </span>
+              </p>
+            </div>
+            <button class="btn btn-outline btn-sm" id="clear-all-items" style="color:#DC2626;border-color:#FECACA;" onmouseover="this.style.background='#FEF2F2'" onmouseout="this.style.background=''">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              Clear all items
+            </button>
+          </header>
+
+          <!-- Toolbar: filter pills + suggestion controls -->
+          <div class="inv-toolbar flex flex-col lg:flex-row lg:items-center gap-4">
+            <div class="flex items-center gap-1.5 flex-wrap" role="tablist">
+              <button class="inv-filter-pill active" data-filter="ALL">All<span class="pill-count text-stone-400 ml-1"></span></button>
+              <button class="inv-filter-pill" data-filter="NEEDS_COST">
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                  Needs cost<span class="pill-count text-stone-400 ml-1"></span>
+                </span>
+              </button>
+              <button class="inv-filter-pill" data-filter="HAS_COST">Has cost<span class="pill-count text-stone-400 ml-1"></span></button>
+              <span class="h-5 w-px bg-stone-300 mx-1"></span>
+              <label class="text-xs text-stone-600 font-medium flex items-center gap-1.5">
+                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                Month
+              </label>
+              <select id="inv-month-filter" class="text-sm px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-300 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15 cursor-pointer">
+                <option value="">All months</option>
+              </select>
+            </div>
+            <div class="lg:ml-auto flex items-center gap-3 text-sm flex-wrap">
+              <span class="flex items-center gap-2 text-stone-700">
+                <i data-lucide="sparkles" class="w-4 h-4 text-brand-600"></i>
+                Suggest at
+              </span>
+              <input type="range" min="10" max="90" step="5" value="50" id="margin-input" class="margin-slider">
+              <span class="mono font-medium min-w-[40px] text-right" id="margin-display">50%</span>
+              <span class="text-xs text-stone-500">margin</span>
+              <button class="btn btn-outline btn-sm" id="toggle-suggestions">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Show suggestions
+              </button>
+              <button class="btn btn-primary btn-sm" id="bulk-accept-suggestions">
+                <i data-lucide="wand" class="w-3.5 h-3.5"></i> Apply to all empty
+              </button>
+            </div>
+          </div>
+
+          <!-- Bulk-edit bar — appears when 2+ items selected -->
+          <div id="bulk-bar" class="inv-bulk-bar hidden">
+            <span class="flex items-center gap-2 font-medium">
+              <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              <span id="bulk-count">0 selected</span>
+            </span>
+            <span class="h-4 w-px bg-white/30"></span>
+            <span class="text-sm">Set cost:</span>
+            <input type="number" id="bulk-input" class="bulk-input" placeholder="0.00" step="0.01" min="0">
+            <button class="btn btn-sm btn-on-orange" id="bulk-apply">Apply to selected</button>
+            <button class="ml-auto text-sm text-white/80 hover:text-white" id="bulk-clear">
+              <i data-lucide="x" class="w-3.5 h-3.5 inline"></i>
+              Clear selection
+            </button>
+          </div>
+
+          <!-- Search bar -->
+          <div class="relative">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none"></i>
+            <input id="inv-search" type="search" placeholder="Search inventory by title or SKU…"
+              class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-stone-200 bg-white text-sm focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15"
+              autocomplete="off" spellcheck="false">
+            <button id="inv-search-clear" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700" aria-label="Clear search">
+              <i data-lucide="x-circle" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Totals strip — source of truth for Dashboard cards, chart, and Tax page -->
+          <div class="card-tight p-4 flex flex-wrap items-center gap-x-8 gap-y-3">
+            <div>
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Total sold</p>
+              <p class="mono text-lg font-semibold mt-0.5" id="inv-total-sold">£0.00</p>
+              <p class="text-xs text-stone-500 mt-0.5" id="inv-total-sold-note">across all items</p>
+            </div>
+            <div>
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Total cost</p>
+              <p class="mono text-lg font-semibold mt-0.5" id="inv-total-cost">£0.00</p>
+              <p class="text-xs text-stone-500 mt-0.5" id="inv-total-cost-note">0 of 0 filled</p>
+            </div>
+            <div>
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Total profit</p>
+              <p class="mono text-lg font-semibold mt-0.5" id="inv-total-profit">£0.00</p>
+              <p class="text-xs text-stone-500 mt-0.5">Sold − cost − fees</p>
+            </div>
+            <button class="ml-auto btn btn-outline btn-sm" id="inv-clear-costs" title="Reset every item's cost to empty">
+              <i data-lucide="eraser" class="w-3.5 h-3.5"></i> Clear all costs
+            </button>
+          </div>
+
+          <!-- Table (Sold column now before Cost) -->
+          <div class="card overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-stone-50 text-xs uppercase tracking-wider text-stone-500">
+                  <tr>
+                    <th class="px-4 py-3" style="width:36px">
+                      <input type="checkbox" class="inv-check" id="inv-select-all">
+                    </th>
+                    <th class="text-left font-medium px-4 py-3 inv-sort-header" data-sort-key="title" title="Sort by title">
+                      <span class="inv-sort-header-inner">SKU / Title<span class="inv-sort-arrow" data-arrow></span></span>
+                    </th>
+                    <th class="text-left font-medium px-4 py-3 inv-sort-header" data-sort-key="platform" title="Sort by platform">
+                      <span class="inv-sort-header-inner">Platform<span class="inv-sort-arrow" data-arrow></span></span>
+                    </th>
+                    <th class="text-right font-medium px-4 py-3 inv-sort-header" data-sort-key="sold" title="Sort by sold price">
+                      <span class="inv-sort-header-inner">Sold<span class="inv-sort-arrow" data-arrow></span></span>
+                    </th>
+                    <th class="text-right font-medium px-4 py-3 inv-sort-header" data-sort-key="cost" title="Sort by cost">
+                      <span class="inv-sort-header-inner">Cost<span class="inv-sort-arrow" data-arrow></span></span>
+                    </th>
+                    <th class="text-right font-medium px-4 py-3 inv-sort-header" data-sort-key="profit" title="Sort by profit">
+                      <span class="inv-sort-header-inner">Profit<span class="inv-sort-arrow" data-arrow></span></span>
+                    </th>
+                    <th class="text-right font-medium px-4 py-3 inv-sort-header" data-sort-key="roi" title="Sort by ROI">
+                      <span class="inv-sort-header-inner">ROI<span class="inv-sort-arrow" data-arrow></span></span>
+                    </th>
+                    <th class="text-left font-medium px-4 py-3 inv-sort-header" data-sort-key="soldAt" title="Sort by sold date">
+                      <span class="inv-sort-header-inner">Sold at<span class="inv-sort-arrow" data-arrow></span></span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="inv-rows" class="divide-y divide-stone-200"></tbody>
+              </table>
+              <div id="inv-pagination"></div>
+            </div>
+          </div>
+
+          <!-- Keyboard hints -->
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-stone-500 pt-2">
+            <span class="font-medium text-stone-600">Keyboard:</span>
+            <span><span class="kbd">↑↓</span> move row</span>
+            <span><span class="kbd">Tab</span> / <span class="kbd">⏎</span> save &amp; next</span>
+            <span><span class="kbd">Esc</span> cancel</span>
+            <span><span class="kbd">⇧</span>+click for range select</span>
+          </div>
+        </section>
+
+        <!-- IMPORT -->
+        <section id="tab-import" class="tab-panel space-y-8" style="max-width:820px;">
+          <header>
+            <h1 class="h-section text-3xl">Import marketplace CSV</h1>
+            <p class="text-sm text-stone-500 mt-1 leading-relaxed">
+              Drop in your eBay Transaction Report, Etsy Orders CSV, or Depop sales download.
+              We auto-detect the marketplace from the column headers.
+            </p>
+          </header>
+          <div class="dropzone" id="csv-dropzone">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-100 text-brand-700 mb-4">
+              <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-medium text-lg">Drop your CSV here</h3>
+            <p class="mt-1 text-sm text-stone-500">eBay, Etsy or Depop — drop multiple files at once. Up to 10 MB each.</p>
+            <input type="file" id="csv-file-input" accept=".csv" multiple style="display:none;">
+            <button class="btn btn-outline mt-5" id="csv-choose-btn">
+              <i data-lucide="folder-open" class="w-4 h-4"></i>
+              Choose files
+            </button>
+            <div id="import-feedback" class="hidden" style="text-align:left;"></div>
+          </div>
+          <div class="card p-6">
+            <h2 class="text-sm font-medium">Where to find your export</h2>
+            <div class="mt-3 space-y-3 text-sm text-stone-600 leading-relaxed">
+              <p><strong class="text-stone-800">eBay:</strong> Seller Hub → Payments → Reports → Transaction report.</p>
+              <p><strong class="text-stone-800">Etsy:</strong> Shop Manager → Settings → Options → Download Data → Orders CSV.</p>
+              <p><strong class="text-stone-800">Depop:</strong> Seller dashboard → sales download. Note: Depop limits exports to 3-month chunks — upload several to cover a full tax year.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAX -->
+        <section id="tab-tax" class="tab-panel space-y-8">
+          <header class="flex items-end justify-between gap-6 flex-wrap">
+            <div>
+              <h1 class="h-section text-3xl">Tax</h1>
+              <p class="text-sm text-stone-500 mt-1">UK Self Assessment estimate · SA103S · rest of UK rates</p>
+            </div>
+            <div class="flex items-center gap-2" id="year-selector">
+              <button class="btn btn-primary year-btn btn-sm" data-year="2024">2024/25</button>
+              <button class="btn btn-outline year-btn btn-sm" data-year="2025">2025/26</button>
+            </div>
+          </header>
+
+          <!-- Tax inputs (synced with Settings) -->
+          <div class="card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-sm font-medium">Your tax inputs</h3>
+                <p class="text-xs text-stone-500 mt-0.5">Changes here also update the Settings tab. Affects the figures below in real time.</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-xs text-brand-700">
+                <i data-lucide="link-2" class="w-3.5 h-3.5"></i>
+                Synced with Settings
+              </span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-xs font-medium block mb-1.5" for="tax-paye">Annual PAYE income (£)</label>
+                <input id="tax-paye" data-taxinp="paye" type="number" min="0" step="100" class="input mono" placeholder="32000">
+              </div>
+              <div>
+                <label class="text-xs font-medium block mb-1.5" for="tax-sl">Student loan plan</label>
+                <select id="tax-sl" data-taxinp="sl" class="input">
+                  <option value="NONE">No student loan</option>
+                  <option value="PLAN_1">Plan 1</option>
+                  <option value="PLAN_2">Plan 2</option>
+                  <option value="PLAN_4">Plan 4 (Scotland)</option>
+                  <option value="PLAN_5">Plan 5</option>
+                  <option value="POSTGRAD">Postgraduate</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cost-warning banner — same source of truth as everywhere else -->
+          <div id="tax-cost-warning" class="hidden rounded-xl px-4 py-3 text-sm flex items-center justify-between gap-3" style="background:#FFF7ED;border:1px solid #FED7AA;">
+            <div class="flex items-center gap-3">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-brand-700 flex-shrink-0"></i>
+              <span><span id="tax-cost-warning-count">0</span> items still need a cost price — the figures below assume £0 cost for those items, so your <strong>tax estimate is too high</strong> until you fill them in.</span>
+            </div>
+            <a href="#" data-tab-link="inventory" class="btn btn-outline btn-sm flex-shrink-0">Open inventory →</a>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="card-tight p-5 relative">
+              <span class="ll-help absolute top-3 right-3" tabindex="0" aria-label="What does Turnover mean?">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                <span class="ll-tip"><strong>Turnover</strong> is your gross income from reselling — total sale prices (plus any shipping you charged the buyer) before fees, refunds or costs come off. HMRC's <strong>Box 9</strong>.<span class="ll-tip-source">Source: gov.uk SA103S notes, Box 9</span></span>
+              </span>
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Turnover</p>
+              <p class="mt-2 mono text-2xl font-semibold" id="tax-turnover">£0.00</p>
+            </div>
+            <div class="card-tight p-5 relative">
+              <span class="ll-help absolute top-3 right-3" tabindex="0" aria-label="What counts as an allowable expense?">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                <span class="ll-tip"><strong>Allowable expenses</strong> are everything HMRC lets you deduct: cost of items sold (COGS), platform fees, postage labels, refunds and general business costs like packaging or mileage.<span class="ll-tip-source">Source: gov.uk/expenses-if-youre-self-employed</span></span>
+              </span>
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Allowable expenses</p>
+              <p class="mt-2 mono text-2xl font-semibold" id="tax-expenses">£9,900.00</p>
+            </div>
+            <div class="card-tight p-5 relative">
+              <span class="ll-help absolute top-3 right-3" tabindex="0" aria-label="What is trading profit?">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                <span class="ll-tip"><strong>Trading profit</strong> is turnover minus allowable expenses — the figure income tax and Class 4 NIC are calculated on. <strong>Box 21</strong> and <strong>Box 31</strong> on SA103S.<span class="ll-tip-source">Source: gov.uk SA103S notes, Boxes 21 &amp; 31</span></span>
+              </span>
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Trading profit</p>
+              <p class="mt-2 mono text-2xl font-semibold text-profit" id="tax-profit">£8,600.00</p>
+            </div>
+            <div class="card-tight p-5 relative">
+              <span class="ll-help absolute top-3 right-3" tabindex="0" aria-label="How is estimated tax due calculated?">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                <span class="ll-tip"><strong>Estimated tax due</strong> = income tax + Class 4 NIC + student loan repayment, stacked at your marginal rate on top of your PAYE salary. Set PAYE + student loan plan in the inputs above.<span class="ll-tip-source">Source: HMRC Self Assessment manual</span></span>
+              </span>
+              <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Estimated tax due</p>
+              <p class="mt-2 mono text-2xl font-semibold" id="tax-due">£2,494.00</p>
+            </div>
+          </div>
+          <div class="card p-6 relative">
+            <span class="ll-help absolute top-4 right-4" tabindex="0" aria-label="What is the trading allowance?">
+              <i data-lucide="help-circle" class="w-4 h-4"></i>
+              <span class="ll-tip">The <strong>£1,000 trading allowance</strong> lets you deduct a flat £1,000 from your gross trading income without keeping receipts. It's worth choosing when your actual costs and fees are under £1,000 — otherwise the actual-expenses route gives you a lower tax bill. <br><br>Click either card below to lock in your choice. The cheaper option is auto-selected for you.<br><br><span style="color:#FED7AA">Source: gov.uk/guidance/tax-free-allowances-on-property-and-trading-income</span></span>
+            </span>
+            <h3 class="text-sm font-medium">Trading allowance vs actual expenses</h3>
+            <p class="text-xs text-stone-500 mt-1 max-w-prose">Deduct your actual allowable expenses OR claim the flat £1,000 trading allowance. We pick the lower-tax option for you — click either card to override.</p>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button id="scenario-actual" data-path="actual" class="scenario-btn rounded-xl p-5 text-left transition-all border-2 border-stone-200 hover:border-brand-300 hover:bg-brand-50/50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium">Actual expenses</span>
+                  <span class="scenario-pill"></span>
+                </div>
+                <div class="mt-2 mono text-2xl font-bold" id="scenario-actual-val">£0.00</div>
+                <p class="text-xs text-stone-500 mt-1">Trading profit under this option</p>
+              </button>
+              <button id="scenario-allowance" data-path="allowance" class="scenario-btn rounded-xl p-5 text-left transition-all border-2 border-stone-200 hover:border-brand-300 hover:bg-brand-50/50 cursor-pointer">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium">£1,000 trading allowance</span>
+                  <span class="scenario-pill"></span>
+                </div>
+                <div class="mt-2 mono text-2xl font-bold" id="scenario-allowance-val">£0.00</div>
+                <p class="text-xs text-stone-500 mt-1">Trading profit under this option</p>
+              </button>
+            </div>
+            <p class="text-xs text-stone-500 mt-3" id="scenario-status"></p>
+          </div>
+          <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
+            <div class="card overflow-hidden">
+              <header class="bg-stone-50 px-5 py-3 border-b border-stone-200">
+                <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">SA103S</p>
+                <h2 class="font-semibold mt-1">UK self-employment estimate</h2>
+              </header>
+              <div class="divide-y divide-stone-200">
+                <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 9</div><div><div class="text-sm font-medium">Your turnover</div></div><div class="mono font-medium" id="row-9">£18,500.00</div></div>
+                <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 20</div><div><div class="text-sm font-medium">Total allowable expenses</div></div><div class="mono font-medium" id="row-20">£9,900.00</div></div>
+                <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 21</div><div><div class="text-sm font-medium">Net profit</div></div><div class="mono font-medium" id="row-21">£8,600.00</div></div>
+                <div class="sa103-row"><div class="mono text-xs text-stone-500">Box 31</div><div><div class="text-sm font-medium">Total taxable profits</div></div><div class="mono font-medium" id="row-31">£8,600.00</div></div>
+              </div>
+            </div>
+            <aside class="space-y-4">
+              <div class="card-tight p-5">
+                <h3 class="text-sm font-medium">Breakdown</h3>
+                <div class="mt-4 space-y-2 text-xs">
+                  <div class="flex justify-between items-center">
+                    <span class="text-stone-500 flex items-center gap-1.5">
+                      COGS
+                      <span class="ll-help" tabindex="0" aria-label="What is COGS?">
+                        <i data-lucide="help-circle" class="w-3 h-3"></i>
+                        <span class="ll-tip left"><strong>Cost of Goods Sold</strong> — the price you paid for items, summed across everything that sold during the year. The single biggest deductible expense for most resellers. Only items where you've entered a cost on the Inventory tab count here.</span>
+                      </span>
+                    </span>
+                    <span class="mono" id="bd-cogs">£6,200.00</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-stone-500 flex items-center gap-1.5">
+                      Direct sale costs
+                      <span class="ll-help" tabindex="0" aria-label="What counts as direct sale costs?">
+                        <i data-lucide="help-circle" class="w-3 h-3"></i>
+                        <span class="ll-tip left"><strong>Direct sale costs</strong> are anything that varies per sale: marketplace <strong>selling fees</strong>, payment processing fees, postage labels you paid for, and refunds you issued. These come straight off your gross sale price and are pulled automatically from your CSV imports.</span>
+                      </span>
+                    </span>
+                    <span class="mono" id="bd-dsc">£2,800.00</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-stone-500 flex items-center gap-1.5">
+                      General expenses
+                      <span class="ll-help" tabindex="0" aria-label="What are general expenses?">
+                        <i data-lucide="help-circle" class="w-3 h-3"></i>
+                        <span class="ll-tip left"><strong>General expenses</strong> aren't tied to one specific item — packaging supplies, mileage to source stock, your accounting subscription, the use-of-home flat-rate, phone bills for the business etc. Log them on the <strong>Expenses</strong> page (coming soon) and they'll flow into Box 20 here.</span>
+                      </span>
+                    </span>
+                    <span class="mono" id="bd-gen">£900.00</span>
+                  </div>
+                  <div class="border-t border-stone-200 my-2"></div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-stone-500 flex items-center gap-1.5">
+                      Income tax (marginal)
+                      <span class="ll-help" tabindex="0" aria-label="What does marginal income tax mean?">
+                        <i data-lucide="help-circle" class="w-3 h-3"></i>
+                        <span class="ll-tip left"><strong>Marginal income tax</strong> means the tax is calculated at the rate of whichever band your reselling profit falls into <em>once stacked on top of your PAYE salary</em>. If your day job already fills the basic-rate band (£12,570–£50,270), your reselling profit gets taxed at the <strong>40% higher rate</strong>. If you have no PAYE, the first £12,570 of profit is tax-free.<span class="ll-tip-source">Source: gov.uk/income-tax-rates</span></span>
+                      </span>
+                    </span>
+                    <span class="mono" id="bd-it">£1,720.00</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-stone-500 flex items-center gap-1.5">
+                      Class 4 NIC
+                      <span class="ll-help" tabindex="0" aria-label="What is Class 4 National Insurance?">
+                        <i data-lucide="help-circle" class="w-3 h-3"></i>
+                        <span class="ll-tip left"><strong>Class 4 National Insurance</strong> is a percentage of your self-employed profit that goes to HMRC alongside income tax. <strong>6%</strong> on profit between £12,570 and £50,270, then <strong>2%</strong> on profit above that. PAYE-only earners pay Class 1 via their payslip — Class 4 only applies to your self-employed slice.<span class="ll-tip-source">Source: gov.uk/self-employed-national-insurance-rates</span></span>
+                      </span>
+                    </span>
+                    <span class="mono" id="bd-c4">£0.00</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-stone-500 flex items-center gap-1.5">
+                      Student loan
+                      <span class="ll-help" tabindex="0" aria-label="How is student loan repayment calculated?">
+                        <i data-lucide="help-circle" class="w-3 h-3"></i>
+                        <span class="ll-tip left"><strong>Student loan repayment</strong> on the trading profit portion, on top of whatever your PAYE already deducts. Each plan has a different income threshold and rate (mostly 9%; Postgrad is 6%). Set yours under <strong>Tax inputs</strong> above — or change to "No student loan" if you've paid yours off.<span class="ll-tip-source">Source: gov.uk/repaying-your-student-loan</span></span>
+                      </span>
+                    </span>
+                    <span class="mono" id="bd-sl">£774.00</span>
+                  </div>
+                  <div class="border-t border-stone-200 my-2"></div>
+                  <div class="flex justify-between font-medium"><span>Total</span><span class="mono" id="bd-total">£2,494.00</span></div>
+                </div>
+              </div>
+              <div class="card-tight p-5">
+                <h3 class="text-sm font-medium">Exports</h3>
+                <p class="text-xs text-stone-500 mt-1">A one-page summary with the four HMRC figures and a tax-bill breakdown for your records.</p>
+                <div class="mt-4 flex flex-col gap-2">
+                  <button class="btn btn-primary btn-sm w-full" style="justify-content:flex-start;" onclick="downloadSa103Pdf()">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> Download SA103S summary (PDF)
+                  </button>
+                  <button class="btn btn-outline btn-sm w-full" id="accountant-pack-btn" style="justify-content:flex-start;" onclick="downloadAccountantPack()">
+                    <i data-lucide="briefcase" class="w-4 h-4"></i> Download Accountant Pack (.xlsx)
+                  </button>
+                  <p class="text-xs text-stone-400 mt-1" id="accountant-pack-note">SA103S figures, item-level profit, expenses breakdown &amp; assumptions — ready to send to your bookkeeper.</p>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="tab-settings" class="tab-panel space-y-8" style="max-width:640px;">
+          <header>
+            <h1 class="h-section text-3xl">Settings</h1>
+            <p class="text-sm text-stone-500 mt-1">Tax inputs and account preferences.</p>
+          </header>
+          <div class="card p-6">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h2 class="text-sm font-medium">Tax inputs</h2>
+                <p class="text-xs text-stone-500 mt-1">Editing these here updates the Tax tab in real time — and every tax estimate across the app.</p>
+              </div>
+              <i data-lucide="link-2" class="w-4 h-4 text-brand-600 mt-1" title="Synced with the Tax tab"></i>
+            </div>
+            <div class="mt-5 space-y-4">
+              <div>
+                <label class="text-sm font-medium block mb-2" for="set-paye">Annual PAYE income (£)</label>
+                <input id="set-paye" data-taxinp="paye" type="number" min="0" step="100" class="input mono" placeholder="32000">
+                <p class="text-xs text-stone-500 mt-1.5">Your day-job salary before tax. Shapes whether reselling profit lands in the 20% or 40% band.</p>
+              </div>
+              <div>
+                <label class="text-sm font-medium block mb-2" for="set-sl">Student loan plan</label>
+                <select id="set-sl" data-taxinp="sl" class="input">
+                  <option value="NONE">No student loan</option>
+                  <option value="PLAN_1">Plan 1</option>
+                  <option value="PLAN_2">Plan 2</option>
+                  <option value="PLAN_4">Plan 4 (Scotland)</option>
+                  <option value="PLAN_5">Plan 5</option>
+                  <option value="POSTGRAD">Postgraduate</option>
+                </select>
+                <p class="text-xs text-stone-500 mt-1.5">Marginal repayment is added on top of your tax owed.</p>
+              </div>
+              <div>
+                <label class="text-sm font-medium block mb-2">Jurisdiction</label>
+                <input value="EW_NI" class="input mono" disabled>
+                <p class="text-xs text-stone-500 mt-1.5">Switching to Scottish bands is on the v1.1 roadmap.</p>
+              </div>
+            </div>
+          </div>
+          <!-- System diagnostics — runs the same audit the dev console can
+               trigger via LL.audit(), but renders the results visually so
+               anyone (not just developers) can verify every number on the
+               site is correctly derived from the inventory. -->
+          <div class="card p-6">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h2 class="text-sm font-medium flex items-center gap-2">
+                  System diagnostics
+                  <span class="ll-help" tabindex="0" aria-label="What do these diagnostics check?">
+                    <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                    <span class="ll-tip left">Runs <strong>50+ consistency checks</strong> across every code path that touches your inventory data. Verifies the dashboard cards, tax page, SA103 mirror, sidebar breakdown, platform mix, Avg ROI, chart series and SA103 CSV export all line up exactly with your inventory totals — under every PAYE band, both tax years, and both allowance/actual paths. <br><br>A green result means every number on every page reflects your inventory truthfully. A red result means something has drifted — open the browser console for the detailed line-by-line report.</span>
+                  </span>
+                </h2>
+                <p class="text-xs text-stone-500 mt-1">Verify every figure on the site matches your inventory.</p>
+              </div>
+              <button class="btn btn-outline btn-sm" id="diag-run">
+                <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                Run diagnostics
+              </button>
+            </div>
+            <div id="diag-result" class="mt-5 hidden"></div>
+          </div>
+
+          <div class="card p-6">
+            <h2 class="text-sm font-medium">Subscription</h2>
+            <div class="mt-4 flex items-center justify-between">
+              <div>
+                <p class="text-sm font-medium">Pro Annual</p>
+                <p class="text-xs text-stone-500 mt-1">£84/year · Renews 12 May 2027</p>
+              </div>
+              <button class="btn btn-outline btn-sm">Manage</button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -116,9 +116,39 @@
     }
   }
 
+  function initMobileNav() {
+    const btn = document.getElementById('mobile-nav-btn');
+    const panel = document.getElementById('mobile-nav');
+    if (!btn || !panel) return;
+
+    const setOpen = (open) => {
+      panel.classList.toggle('is-open', open);
+      btn.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    };
+
+    btn.addEventListener('click', () => {
+      setOpen(!panel.classList.contains('is-open'));
+    });
+
+    panel.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => setOpen(false));
+    });
+
+    window.addEventListener(
+      'resize',
+      () => {
+        if (window.matchMedia('(min-width: 769px)').matches) setOpen(false);
+      },
+      { passive: true }
+    );
+  }
+
   function init() {
     refreshIcons();
     initNavScroll();
+    initMobileNav();
     initHeroPreview();
     initPlatformPulse();
     initHowSteps();

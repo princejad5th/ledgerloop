@@ -230,13 +230,8 @@
   .faq-item summary .chev { transition: transform 200ms; }
   .faq-item[open] summary .chev { transform: rotate(180deg); }
 
-  /* Section padding */
+  /* Section padding — desktop baseline (locked); phone overrides at end of stylesheet */
   .section { padding: 72px 0; }
-  @media (max-width: 768px) {
-    .section { padding: 48px 0; }
-    .h-display { font-size: 40px !important; }
-    .price-card-featured { transform: none; }
-  }
 
   /* Focus */
   button:focus, a:focus, summary:focus { outline:none; }
@@ -340,15 +335,43 @@
   .cta-catalogue .catalogue-tile em { color: rgba(255, 237, 213, 0.7); }
   .cta-catalogue .catalogue-rail-1 { top: 12%; }
   .cta-catalogue .catalogue-rail-2 { top: 58%; }
-  @media (max-width: 768px) {
-    .hero-catalogue { opacity: 0.32; }
-    .catalogue-rail-1 { top: 12%; }
-    .catalogue-rail-2 { top: 58%; }
-    .catalogue-tile { width: 88px; height: 68px; border-radius: 10px; }
-    .catalogue-tile svg { width: 18px; height: 18px; }
-    .catalogue-rail-left .catalogue-track { animation-duration: 48s; }
-    .catalogue-rail-right .catalogue-track { animation-duration: 52s; }
+
+  /* Mobile nav — hidden on desktop */
+  .mobile-nav-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #E7E5E4;
+    background: #FFFFFF;
+    color: #44403C;
+    cursor: pointer;
+    flex-shrink: 0;
   }
+  .mobile-nav-btn .nav-icon-close { display: none; }
+  .mobile-nav-btn.is-open .nav-icon-open { display: none; }
+  .mobile-nav-btn.is-open .nav-icon-close { display: block; }
+  .nav-cta-short { display: none; }
+  .mobile-nav-panel {
+    display: none;
+    border-top: 1px solid #FED7AA;
+    background: rgba(255, 251, 245, 0.98);
+    padding: 8px 16px 16px;
+  }
+  .mobile-nav-panel a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 12px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #44403C;
+    text-decoration: none;
+  }
+  .mobile-nav-panel a:active { background: #FFF7ED; color: #9A3412; }
 
   /* Hero preview entrance + count-up */
   .hero-preview {
@@ -641,6 +664,116 @@
   .calc-select:focus { outline: none; border-color: #F97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.15); }
   /* Result line item */
   .calc-line { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; }
+
+  /* ============================================================
+     MOBILE-ONLY — desktop styles above are locked.
+     Nothing in this block applies at 769px and up.
+     ============================================================ */
+  @media (max-width: 768px) {
+    .container-x { padding-left: 16px; padding-right: 16px; }
+    .section { padding: 40px 0; }
+
+    /* Type — keep hierarchy, reduce shoutiness */
+    .h-display { font-size: 2.125rem !important; line-height: 1.12; letter-spacing: -0.03em; }
+    .h-section { line-height: 1.2; }
+
+    /* Header: logo + short CTA + menu */
+    .nav-signin { display: none !important; }
+    .nav-cta-long { display: none; }
+    .nav-cta-short { display: inline; }
+    .mobile-nav-btn { display: inline-flex; }
+    .mobile-nav-panel.is-open { display: block; }
+    .sticky-header .btn-sm { padding: 0 12px; }
+    .sticky-header .btn-primary.btn-sm .w-4 { display: none; }
+
+    /* Quieter décor so copy stays readable */
+    .hero-catalogue { opacity: 0.16; }
+    .catalogue-rail-1 { top: 10%; }
+    .catalogue-rail-2 { top: 62%; }
+    .catalogue-tile { width: 76px; height: 60px; border-radius: 10px; gap: 5px; }
+    .catalogue-tile svg { width: 16px; height: 16px; }
+    .catalogue-tile em { font-size: 9px; max-width: 68px; }
+    .catalogue-rail-left .catalogue-track { animation-duration: 48s; }
+    .catalogue-rail-right .catalogue-track { animation-duration: 52s; }
+    .pattern-overlay { opacity: 0.22 !important; }
+
+    /* Hero rhythm */
+    .bg-hero .container-x { padding-top: 2.25rem; padding-bottom: 2.75rem; }
+    .hero-actions {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      max-width: 22rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-actions .btn { width: 100%; }
+    .hero-trust { gap: 0.5rem 1rem !important; font-size: 13px; }
+    .hero-platforms { margin-top: 2rem !important; gap: 0.5rem !important; }
+    .hero-platforms .text-xs.uppercase { width: 100%; margin: 0 0 0.25rem; text-align: center; }
+    .platform-pill { padding: 7px 12px; font-size: 13px; }
+
+    /* Tax preview card */
+    .hero-preview-wrap { margin-top: 2.5rem !important; }
+    .hero-preview-wrap > .absolute { inset: -1.5rem !important; }
+    .hero-preview-body { padding: 1.15rem !important; gap: 1.25rem !important; }
+    .hero-preview-body .mono.text-2xl { font-size: 1.35rem; }
+    .hero-preview-body .mono.text-lg { font-size: 0.95rem; }
+
+    /* SA103 table — readable columns on narrow screens */
+    .sa103-row {
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      gap: 6px 8px;
+      padding: 12px 14px;
+      align-items: start;
+    }
+    .sa103-row > :nth-child(2) .text-xs { font-size: 11px; }
+    .sa103-row > :last-child { font-size: 13px; white-space: nowrap; }
+
+    /* Cards / benefits / pricing */
+    .benefit-card { padding: 20px; }
+    .benefit-card:hover,
+    .card-feature:hover { transform: none; }
+    .price-card-featured {
+      transform: none;
+      animation: none;
+      margin-top: 0.5rem;
+    }
+    #pricing .card,
+    #pricing .price-card-featured { padding: 1.35rem; }
+    #pricing .mono.text-5xl { font-size: 2.5rem; }
+
+    /* Feature section headings that use Tailwind size utilities */
+    #features .h-section.text-4xl,
+    #pricing .h-section.text-4xl,
+    #faq .h-section.text-4xl { font-size: 1.75rem !important; }
+    .bg-band-warm .h-section.text-3xl { font-size: 1.5rem !important; }
+
+    /* Calculator */
+    #calculator .h-section.text-3xl { font-size: 1.5rem !important; }
+    .calc-num-input { width: 5.75rem; font-size: 13px; padding: 5px 8px; }
+    .calc-headline { font-size: 2.35rem !important; }
+    #calc-year-toggle { width: 100%; max-width: 11rem; }
+    #calculator .btn-primary.btn-sm {
+      white-space: normal;
+      height: auto;
+      min-height: 40px;
+      padding: 10px 14px;
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    /* FAQ touch targets */
+    .faq-item { padding-left: 1rem; padding-right: 1rem; }
+    .faq-item summary { padding: 16px 0; gap: 12px; font-size: 15px; }
+
+    /* Footer */
+    footer .container-x { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+    footer .grid { gap: 1.75rem; }
+
+    /* Soften primary hover lift on touch */
+    .btn-primary:hover { transform: none; }
+  }
 </style>
 </head>
 <body>
@@ -649,8 +782,8 @@
 
   <!-- Sticky Nav -->
   <header class="sticky-header nav-blur border-b border-stone-200">
-    <div class="container-x h-16 flex items-center justify-between">
-      <a href="#/" class="flex items-center gap-2.5 font-semibold text-base">
+    <div class="container-x h-16 flex items-center justify-between gap-3">
+      <a href="#/" class="flex items-center gap-2.5 font-semibold text-base flex-shrink-0">
         <span class="wordmark wordmark-sm wordmark-draw">
           <svg width="14" height="14" viewBox="0 0 32 32" fill="none">
             <path d="M9 9v14h14" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -669,13 +802,25 @@
         <a href="#faq"        class="btn btn-ghost btn-sm">FAQ</a>
       </nav>
       <div class="flex items-center gap-2">
-        <a href="#/login" class="btn btn-ghost btn-sm">Sign in</a>
-        <a href="#/login" class="btn btn-primary btn-sm">
-          Start free trial
+        <a href="#/login" class="btn btn-ghost btn-sm nav-signin">Sign in</a>
+        <a href="#/login" class="btn btn-primary btn-sm nav-cta-primary">
+          <span class="nav-cta-long">Start free trial</span>
+          <span class="nav-cta-short">Try free</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </a>
+        <button type="button" class="mobile-nav-btn" id="mobile-nav-btn" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
+          <i data-lucide="menu" class="w-5 h-5 nav-icon-open"></i>
+          <i data-lucide="x" class="w-5 h-5 nav-icon-close"></i>
+        </button>
       </div>
     </div>
+    <nav id="mobile-nav" class="mobile-nav-panel" aria-label="Mobile">
+      <a href="#features"><i data-lucide="sparkles" class="w-4 h-4 text-brand-600"></i> Features</a>
+      <a href="#pricing"><i data-lucide="tag" class="w-4 h-4 text-brand-600"></i> Pricing</a>
+      <a href="#calculator"><i data-lucide="calculator" class="w-4 h-4 text-brand-600"></i> Free calculator</a>
+      <a href="#faq"><i data-lucide="help-circle" class="w-4 h-4 text-brand-600"></i> FAQ</a>
+      <a href="#/login"><i data-lucide="log-in" class="w-4 h-4 text-brand-600"></i> Sign in</a>
+    </nav>
   </header>
 
   <!-- Hero -->
@@ -745,7 +890,7 @@
           Drop in your eBay, Etsy or Depop CSV. Get HMRC-ready figures in 60 seconds.
           Per-item profit, ROI and hold time — the tax tool every UK reseller has been waiting for.
         </p>
-        <div class="mt-9 flex flex-wrap gap-3 justify-center">
+        <div class="mt-9 flex flex-wrap gap-3 justify-center hero-actions">
           <a href="#/login" class="btn btn-primary btn-lg">
             Start 14-day free trial
             <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -755,14 +900,14 @@
             <i data-lucide="play-circle" class="w-4 h-4"></i>
           </a>
         </div>
-        <div class="mt-6 flex items-center justify-center gap-x-6 gap-y-2 text-sm text-stone-500 flex-wrap">
+        <div class="mt-6 flex items-center justify-center gap-x-6 gap-y-2 text-sm text-stone-500 flex-wrap hero-trust">
           <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-profit"></i>No card required</span>
           <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-profit"></i>Cancel any time</span>
           <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-profit"></i>HMRC ready</span>
         </div>
 
         <!-- Platform pills -->
-        <div class="mt-12 flex flex-wrap items-center justify-center gap-3">
+        <div class="mt-12 flex flex-wrap items-center justify-center gap-3 hero-platforms">
           <span class="text-xs text-stone-500 uppercase tracking-wider font-medium mr-2">Works with</span>
           <span class="platform-pill" data-platform-pill>
             <span class="pp-icon" style="background:#0064D2">eb</span>
@@ -784,7 +929,7 @@
       </div>
 
       <!-- Mock HMRC-ready preview -->
-      <div class="relative mt-20 mx-auto max-w-5xl">
+      <div class="relative mt-20 mx-auto max-w-5xl hero-preview-wrap">
         <div class="absolute -inset-10 md:-inset-14 pointer-events-none rounded-[40px]" style="background:radial-gradient(ellipse at center, rgba(194,65,12,0.16) 0%, rgba(249,115,22,0.08) 42%, transparent 70%);"></div>
         <div id="hero-preview" class="relative card shadow-glow overflow-hidden hero-preview ring-1 ring-brand-300/60">
         <div class="bg-stone-50 border-b border-stone-200 px-5 py-3 flex items-center gap-2">
@@ -795,7 +940,7 @@
           </div>
           <span class="text-xs text-stone-500 ml-3 mono">app.ledgerloop.app/tax</span>
         </div>
-        <div class="p-8 grid md:grid-cols-2 gap-8 items-center bg-gradient-to-br from-white to-brand-50/40">
+        <div class="p-8 grid md:grid-cols-2 gap-8 items-center bg-gradient-to-br from-white to-brand-50/40 hero-preview-body">
           <div>
             <span class="badge badge-success badge-dot mb-3">HMRC ready</span>
             <h3 class="h-section text-2xl mb-4">Your 2025/26 tax estimate</h3>

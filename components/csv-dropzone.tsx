@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { parseEbayTransactionReport } from '@/lib/csv/ebay-parser';
 import { formatGBP, formatDate } from '@/lib/utils';
 import type { ParseResult } from '@/lib/csv/types';
-import { commitImportAction } from '@/app/(app)/import/actions';
+import { commitImportAction } from '@/app/app/import/actions';
 
 export function CsvDropzone() {
   const router = useRouter();

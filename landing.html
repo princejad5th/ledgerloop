@@ -38,7 +38,7 @@
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-    background: #FAFAF9; color: #1C1917; overflow-x: hidden;
+    background: #FFFBF5; color: #1C1917; overflow-x: hidden;
   }
   .mono, .tabular { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
   .container-x { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
@@ -46,7 +46,10 @@
   .tab-panel { display: none; } .tab-panel.active { display: block; }
 
   /* Nav */
-  .nav-blur { backdrop-filter: saturate(180%) blur(14px); background: rgba(255,255,255,0.82); }
+  .nav-blur {
+    backdrop-filter: saturate(180%) blur(14px);
+    background: rgba(255, 251, 245, 0.86);
+  }
 
   /* Type */
   .h-display { font-weight: 700; letter-spacing: -0.025em; line-height: 1.05; }
@@ -66,27 +69,58 @@
     50% { background-position: 100% center; }
   }
 
-  /* Section backgrounds — each section has its own subtle treatment for visual rhythm */
+  /* Section backgrounds — continuous warm brand rhythm */
   .bg-hero {
     background:
-      radial-gradient(1000px 600px at 80% 0%, rgba(249,115,22,0.10), transparent 60%),
-      radial-gradient(800px 500px at 10% 90%, rgba(249,115,22,0.06), transparent 60%),
-      linear-gradient(180deg, #FFFBF5 0%, #FFFFFF 100%);
+      radial-gradient(1100px 640px at 85% -10%, rgba(249,115,22,0.14), transparent 58%),
+      radial-gradient(900px 520px at 8% 95%, rgba(234,88,12,0.08), transparent 55%),
+      linear-gradient(180deg, #FFF7ED 0%, #FFFBF5 42%, #FFFFFF 100%);
   }
-  .bg-cream  { background: linear-gradient(180deg, #FFFFFF 0%, #FFF7ED 50%, #FFFFFF 100%); }
+  /* Soft white that still carries a hint of brand warmth */
+  .bg-band-soft {
+    background:
+      linear-gradient(180deg, #FFFFFF 0%, #FFFBF5 100%);
+  }
+  /* Mid warm wash — for benefits / pricing / CTA shell */
+  .bg-band-warm {
+    background:
+      radial-gradient(900px 480px at 50% 0%, rgba(249,115,22,0.07), transparent 62%),
+      linear-gradient(180deg, #FFFBF5 0%, #FFF7ED 48%, #FFFBF5 100%);
+  }
+  /* Light amber strip — platforms */
+  .bg-band-amber {
+    background:
+      radial-gradient(700px 280px at 50% 50%, rgba(249,115,22,0.06), transparent 70%),
+      linear-gradient(180deg, #FFF7ED 0%, #FFEDD5 50%, #FFF7ED 100%);
+  }
+  /* FAQ after calculator — continue cream, lift mid for readability */
+  .bg-band-faq {
+    background:
+      radial-gradient(800px 360px at 50% 0%, rgba(249,115,22,0.05), transparent 65%),
+      linear-gradient(180deg, #FFF7ED 0%, #FFFFFF 40%, #FFFBF5 100%);
+  }
+  .bg-cream  { background: linear-gradient(180deg, #FFFBF5 0%, #FFF7ED 50%, #FFFBF5 100%); }
   .bg-warm   { background: #FFFBF5; }
   .bg-amber-tint {
     background:
-      radial-gradient(800px 400px at 50% 0%, rgba(249,115,22,0.05), transparent 70%),
-      #FFFBF5;
+      radial-gradient(800px 400px at 50% 0%, rgba(249,115,22,0.06), transparent 70%),
+      linear-gradient(180deg, #FFF7ED 0%, #FFFBF5 100%);
   }
-  .bg-white-clean { background: #FFFFFF; }
-  .bg-stone-soft { background: linear-gradient(180deg, #FAFAF9 0%, #FFFFFF 100%); }
+  .bg-white-clean {
+    background: linear-gradient(180deg, #FFFFFF 0%, #FFFBF5 100%);
+  }
+  .bg-stone-soft {
+    background: linear-gradient(180deg, #FFF7ED 0%, #FFFBF5 40%, #FAFAF9 100%);
+  }
 
-  /* Divider with brand tint */
+  /* Soft brand seam between sections */
   .divider-brand {
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, #FED7AA 20%, #FB923C 50%, #FED7AA 80%, transparent 100%);
+    border: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(253,186,116,0.35) 18%, rgba(249,115,22,0.45) 50%, rgba(253,186,116,0.35) 82%, transparent 100%);
+  }
+  .section-fade-top {
+    box-shadow: inset 0 40px 60px -40px rgba(255, 247, 237, 0.9);
   }
 
   /* Buttons */
@@ -106,15 +140,19 @@
   .btn-ghost:hover { background:#F5F5F4; color:#1C1917; }
 
   /* Cards */
-  .card { background:#FFFFFF; border:1px solid #E7E5E4; border-radius:16px; }
+  .card { background:#FFFFFF; border:1px solid #E7E5E4; border-radius:16px; box-shadow: 0 10px 30px -24px rgba(28,25,23,0.18); }
   .card-tight { background:#FFFFFF; border:1px solid #E7E5E4; border-radius:12px; }
   .card-feature {
-    background:#FFFFFF;
-    border:1px solid #E7E5E4;
-    border-radius:16px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FFFBF5 100%);
+    border: 1px solid #E7E5E4;
+    border-radius: 16px;
     transition: all 200ms;
   }
-  .card-feature:hover { border-color: #FED7AA; transform: translateY(-2px); box-shadow: 0 12px 32px -16px rgba(249,115,22,0.25); }
+  .card-feature:hover {
+    border-color: #FED7AA;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px -16px rgba(249,115,22,0.25);
+  }
 
   /* Badges */
   .badge { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:9999px; font-size:12px; font-weight:500; }
@@ -207,6 +245,7 @@
   .sticky-header { position: sticky; top: 0; z-index: 50; transition: box-shadow 200ms ease, border-color 200ms ease; }
   .sticky-header.is-scrolled {
     border-color: #FED7AA;
+    background: rgba(255, 247, 237, 0.92);
     box-shadow: 0 1px 0 rgba(249,115,22,0.12), 0 10px 28px -18px rgba(28,25,23,0.18);
   }
 
@@ -263,8 +302,8 @@
     width: 104px;
     height: 78px;
     border-radius: 12px;
-    border: 1px solid #D6D3D1;
-    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(214, 211, 209, 0.85);
+    background: rgba(255, 255, 255, 0.72);
     box-shadow: 0 1px 0 rgba(28, 25, 23, 0.03);
     display: flex;
     flex-direction: column;
@@ -385,13 +424,14 @@
   .platform-pill {
     display:inline-flex; align-items:center; gap:8px;
     padding:8px 14px;
-    background:#FFFFFF;
-    border:1px solid #E7E5E4;
+    background: rgba(255,255,255,0.88);
+    border:1px solid #FED7AA;
     border-radius:10px;
     font-size:14px; font-weight:500;
     transition: all 200ms;
+    box-shadow: 0 4px 14px -10px rgba(194,65,12,0.35);
   }
-  .platform-pill:hover { border-color:#FED7AA; background:#FFFBF5; }
+  .platform-pill:hover { border-color:#FB923C; background:#FFFBF5; }
   .pp-icon {
     display: inline-flex;
     align-items: center;
@@ -411,13 +451,18 @@
 
   /* Stat highlight (replacement for the deleted fake stats) */
   .benefit-card {
-    background: linear-gradient(180deg, #FFFFFF 0%, #FFFBF5 100%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, #FFFBF5 100%);
     border: 1px solid #FED7AA;
     border-radius: 16px;
     padding: 28px;
     transition: all 200ms;
+    box-shadow: 0 8px 24px -18px rgba(194, 65, 12, 0.25);
   }
-  .benefit-card:hover { border-color: #FB923C; transform: translateY(-2px); box-shadow: 0 16px 36px -16px rgba(249,115,22,0.25); }
+  .benefit-card:hover {
+    border-color: #FB923C;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 36px -16px rgba(249,115,22,0.28);
+  }
 
   /* Chart container */
   .chart-wrap { position: relative; height: 280px; }
@@ -522,9 +567,9 @@
   /* ---------- Calculator ---------- */
   .calc-bg {
     background:
-      radial-gradient(900px 500px at 90% 10%, rgba(249,115,22,0.08), transparent 60%),
-      radial-gradient(700px 400px at 10% 90%, rgba(249,115,22,0.05), transparent 60%),
-      linear-gradient(180deg, #FFFFFF 0%, #FFFBF5 50%, #FFFFFF 100%);
+      radial-gradient(1000px 520px at 92% 8%, rgba(249,115,22,0.09), transparent 58%),
+      radial-gradient(720px 420px at 6% 92%, rgba(194,65,12,0.045), transparent 55%),
+      linear-gradient(180deg, #FFFBF5 0%, #FFFFFF 38%, #FFFBF5 78%, #FFF7ED 100%);
   }
   .calc-output-bg {
     background: linear-gradient(160deg, #FFFFFF 0%, #FFF7ED 100%);
@@ -825,7 +870,7 @@
   <div class="divider-brand"></div>
 
   <!-- BENEFITS strip -->
-  <section class="bg-cream">
+  <section class="bg-band-warm">
     <div class="container-x py-12 md:py-14">
       <div class="max-w-2xl mx-auto text-center reveal mb-8">
         <h2 class="h-section text-3xl md:text-4xl">Built for resellers, not accountants.</h2>
@@ -865,7 +910,7 @@
   </section>
 
   <!-- THE KILLER FEATURE -->
-  <section id="features" class="bg-white-clean section">
+  <section id="features" class="bg-band-soft section">
     <div class="container-x">
       <div class="max-w-2xl mx-auto text-center reveal">
         <span class="badge badge-brand mb-4">The killer feature</span>
@@ -941,7 +986,7 @@
   <div class="divider-brand"></div>
 
   <!-- Platforms — compact (CSV export detail lives in FAQ) -->
-  <section class="bg-amber-tint">
+  <section class="bg-band-amber">
     <div class="container-x py-10 md:py-12">
       <div class="max-w-3xl mx-auto text-center reveal">
         <h2 class="h-section text-2xl md:text-3xl">One tool. Three marketplaces.</h2>
@@ -968,7 +1013,7 @@
   </section>
 
   <!-- PRICING -->
-  <section id="pricing" class="bg-cream section">
+  <section id="pricing" class="bg-band-warm section">
     <div class="container-x">
       <div class="max-w-2xl mx-auto text-center reveal">
         <span class="badge badge-brand mb-4">Pricing</span>
@@ -1059,65 +1104,6 @@
         <span class="flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-brand-600"></i>7-day money-back guarantee</span>
         <span class="flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4 text-brand-600"></i>Secure payment via Stripe</span>
         <span class="flex items-center gap-2"><i data-lucide="heart" class="w-4 h-4 text-brand-600"></i>Made by UK resellers</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section id="faq" class="bg-white-clean section">
-    <div class="container-x">
-      <div class="max-w-2xl mx-auto reveal">
-        <div class="text-center">
-          <span class="badge badge-soft mb-4">FAQ</span>
-          <h2 class="h-section text-4xl md:text-5xl">Common questions.</h2>
-        </div>
-        <div class="mt-8 card divide-y divide-stone-200">
-          <details class="faq-item px-6">
-            <summary>
-              <span class="font-medium">Is LedgerLoop approved by HMRC?</span>
-              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
-            </summary>
-            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
-              No software is "HMRC-approved" for Self Assessment — including major accounting suites.
-              What LedgerLoop produces are accurate <em>estimates</em> mapped to the boxes on your
-              HMRC tax return. Every rate we use is verified from gov.uk. We always recommend you double-check
-              with HMRC or a qualified accountant before submitting your return.
-            </div>
-          </details>
-          <details class="faq-item px-6">
-            <summary>
-              <span class="font-medium">How do I get my CSV from eBay / Etsy / Depop?</span>
-              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
-            </summary>
-            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
-              <strong>eBay:</strong> Seller Hub → Payments → Reports → Transaction report. Pick a date range.<br>
-              <strong>Etsy:</strong> Shop Manager → Settings → Options → Download Data → Orders CSV.<br>
-              <strong>Depop:</strong> Your seller dashboard → sales download (3-month chunks, upload multiple for a full year).<br>
-              Drop the resulting file on the LedgerLoop import page. We auto-detect the platform.
-            </div>
-          </details>
-          <details class="faq-item px-6">
-            <summary>
-              <span class="font-medium">What if I sell on multiple platforms?</span>
-              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
-            </summary>
-            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
-              Upload as many CSVs as you have. We dedupe by order number, so re-uploading the
-              same file is safe. Your dashboard and tax page combine everything across all
-              three platforms automatically.
-            </div>
-          </details>
-          <details class="faq-item px-6">
-            <summary>
-              <span class="font-medium">Can I get a refund?</span>
-              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
-            </summary>
-            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
-              Yes — 7-day money-back guarantee on all paid plans, no questions asked.
-              Data is encrypted and hosted in the UK; payments go through Stripe.
-            </div>
-          </details>
-        </div>
       </div>
     </div>
   </section>
@@ -1292,8 +1278,67 @@
     </div>
   </section>
 
+  <!-- FAQ -->
+  <section id="faq" class="bg-band-faq section">
+    <div class="container-x">
+      <div class="max-w-2xl mx-auto reveal">
+        <div class="text-center">
+          <span class="badge badge-soft mb-4">FAQ</span>
+          <h2 class="h-section text-4xl md:text-5xl">Common questions.</h2>
+        </div>
+        <div class="mt-8 card divide-y divide-stone-200">
+          <details class="faq-item px-6">
+            <summary>
+              <span class="font-medium">Is LedgerLoop approved by HMRC?</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
+            </summary>
+            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
+              No software is "HMRC-approved" for Self Assessment — including major accounting suites.
+              What LedgerLoop produces are accurate <em>estimates</em> mapped to the boxes on your
+              HMRC tax return. Every rate we use is verified from gov.uk. We always recommend you double-check
+              with HMRC or a qualified accountant before submitting your return.
+            </div>
+          </details>
+          <details class="faq-item px-6">
+            <summary>
+              <span class="font-medium">How do I get my CSV from eBay / Etsy / Depop?</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
+            </summary>
+            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
+              <strong>eBay:</strong> Seller Hub → Payments → Reports → Transaction report. Pick a date range.<br>
+              <strong>Etsy:</strong> Shop Manager → Settings → Options → Download Data → Orders CSV.<br>
+              <strong>Depop:</strong> Your seller dashboard → sales download (3-month chunks, upload multiple for a full year).<br>
+              Drop the resulting file on the LedgerLoop import page. We auto-detect the platform.
+            </div>
+          </details>
+          <details class="faq-item px-6">
+            <summary>
+              <span class="font-medium">What if I sell on multiple platforms?</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
+            </summary>
+            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
+              Upload as many CSVs as you have. We dedupe by order number, so re-uploading the
+              same file is safe. Your dashboard and tax page combine everything across all
+              three platforms automatically.
+            </div>
+          </details>
+          <details class="faq-item px-6">
+            <summary>
+              <span class="font-medium">Can I get a refund?</span>
+              <i data-lucide="chevron-down" class="w-5 h-5 chev text-stone-500"></i>
+            </summary>
+            <div class="pb-5 text-stone-600 text-[15px] leading-relaxed">
+              Yes — 7-day money-back guarantee on all paid plans, no questions asked.
+              Data is encrypted and hosted in the UK; payments go through Stripe.
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Final CTA -->
-  <section class="bg-stone-soft">
+  <section class="bg-band-warm" style="background:linear-gradient(180deg,#FFFBF5 0%,#FFF7ED 55%,#FFFBF5 100%);">
     <div class="container-x py-12 md:py-16">
       <div class="max-w-4xl mx-auto card overflow-hidden reveal">
         <div class="px-8 md:px-14 py-12 md:py-16 text-center text-white relative overflow-hidden" style="background:linear-gradient(135deg,#F97316 0%,#C2410C 60%,#9A3412 100%);">
@@ -1361,7 +1406,7 @@
   </section>
 
   <!-- Footer -->
-  <footer class="border-t border-stone-200 bg-white">
+  <footer class="border-t border-brand-100 bg-gradient-to-b from-white to-[#FFFBF5]">
     <div class="container-x py-12">
       <div class="grid md:grid-cols-4 gap-8">
         <div>
